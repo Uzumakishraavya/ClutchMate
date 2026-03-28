@@ -1,3 +1,18 @@
+# Environment variables
 .env
+
+# Python cache
 __pycache__/
 *.pyc
+
+# Database files
+instance/
+*.db
+*.db-journal
+
+# Uploaded files
+uploads/
+
+# Optional (good practice)
+venv/
+.env.local
