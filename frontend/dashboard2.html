@@ -1,0 +1,3823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClutchMate Dashboard</title>
+<style>
+:root {
+  --bg: #eef4ff;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-strong: #ffffff;
+  --ink: #172033;
+  --muted: #64748b;
+  --line: rgba(23, 32, 51, 0.08);
+  --nav: #10233f;
+  --nav-muted: rgba(255, 255, 255, 0.7);
+  --accent: #ff6b35;
+  --accent-2: #2a9d8f;
+  --accent-3: #2563eb;
+  --danger: #ef4444;
+  --shadow: 0 22px 60px rgba(37, 99, 235, 0.12);
+  --shadow-soft: 0 14px 36px rgba(23, 32, 51, 0.08);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --bg-gradient: radial-gradient(circle at top right, rgba(37, 99, 235, 0.16), transparent 24%), radial-gradient(circle at top left, rgba(255, 107, 53, 0.12), transparent 18%), linear-gradient(180deg, #f6f9ff 0%, #eef4ff 100%);
+}
+
+body.dark {
+  --color-brand-bg: #050505;
+  --color-brand-bg-secondary: #0a0a0a;
+  --color-brand-accent: #ff6b00;
+  --color-brand-accent-secondary: #ff9500;
+  --color-brand-text: #ffffff;
+  --color-brand-text-muted: #a1a1aa;
+  --color-brand-border: rgba(255, 255, 255, 0.1);
+
+  --bg: var(--color-brand-bg);
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-strong: var(--color-brand-bg-secondary);
+  --ink: var(--color-brand-text);
+  --muted: var(--color-brand-text-muted);
+  --line: var(--color-brand-border);
+  --nav: var(--color-brand-bg-secondary);
+  --nav-muted: rgba(255, 255, 255, 0.7);
+  --accent: var(--color-brand-accent);
+  --accent-2: var(--color-brand-accent-secondary);
+  --accent-3: #ff6b00;
+  --danger: #ff6b00;
+  --shadow: 0 22px 60px rgba(0, 0, 0, 0.65);
+  --shadow-soft: 0 14px 36px rgba(0, 0, 0, 0.4);
+  --bg-gradient: radial-gradient(circle at top right, rgba(255, 107, 0, 0.18), transparent 24%), radial-gradient(circle at top left, rgba(255, 149, 0, 0.08), transparent 18%), linear-gradient(180deg, #050505 0%, #0a0a0a 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  background: var(--bg-gradient);
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+.app {
+  --sidebar-width: 280px;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100vh;
+  position: relative;
+  transition: grid-template-columns 0.28s var(--ease-out);
+}
+
+.app.sidebar-collapsed {
+  --sidebar-width: 78px;
+}
+
+.sidebar {
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+  min-width: 0;
+  padding: 28px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 107, 53, 0.18), transparent 18%),
+    linear-gradient(180deg, #10233f 0%, #0e1d34 100%);
+  color: white;
+  transition: width 0.22s ease;
+  scrollbar-gutter: stable;
+}
+
+.sidebar.collapsed {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.sidebar.collapsed .brand,
+.sidebar.collapsed .nav-list button span.label,
+.sidebar.collapsed .nav-list button span.text,
+.sidebar.collapsed .nav-list button {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.sidebar.collapsed .nav-list button {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.brand {
+  margin-bottom: 24px;
+}
+
+.brand small {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffd9c9;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.brand h1 {
+  margin: 16px 0 10px;
+  font-size: 30px;
+}
+
+.brand p {
+  margin: 0;
+  color: var(--nav-muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.nav-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  flex: 1;
+  align-content: start;
+}
+
+.nav-list button {
+  text-align: left;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: transform 0.24s var(--ease-out), background 0.2s ease, box-shadow 0.24s ease;
+}
+
+.nav-list button:hover,
+.nav-list button.active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateX(4px);
+  box-shadow: 0 12px 28px rgba(16, 35, 63, 0.22);
+}
+
+.main {
+  padding: 26px;
+  min-width: 0;
+}
+
+.sticky-summary {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: 18px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  box-shadow: 0 8px 20px rgba(23, 32, 51, 0.08);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.summary-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.main {
+  padding: 26px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.hero-card,
+.panel,
+.section-card,
+.list-card,
+.graph-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out),
+    border-color 0.25s ease;
+}
+
+.hero-card:hover,
+.panel:hover,
+.section-card:hover,
+.list-card:hover,
+.graph-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 70px rgba(37, 99, 235, 0.16);
+  border-color: rgba(37, 99, 235, 0.16);
+}
+
+.hero-card {
+  padding: 26px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+  #overviewTodoSection {
+    padding: 24px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .overview-todo-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .overview-todo-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--surface-strong);
+    border: 1px solid var(--line);
+  }
+
+  .overview-todo-item.completed {
+    opacity: 0.72;
+    text-decoration: line-through;
+  }
+
+  .overview-todo-item button {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    background: #2563eb;
+    color: white;
+  }
+
+  .overview-todo-action {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .overview-todo-action input,
+  .overview-todo-action button {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .overview-todo-action input {
+    padding: 10px 12px;
+    border-radius: 12px;
+    flex: 1 1 220px;
+  }
+
+  .overview-todo-action button {
+    background: #2563eb;
+    color: white;
+    min-width: 120px;
+    text-transform: uppercase;
+  }
+}
+
+.hero-copy {
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 720px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.stat {
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+}
+
+.stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.stat strong {
+  font-size: 24px;
+}
+
+.panel {
+  padding: 22px;
+}
+
+.panel h3,
+.section-card h3,
+.graph-card h3,
+.list-card h3 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.subtext {
+  margin: 0 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.quick-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.quick-actions button {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 700;
+  color: white;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s ease, filter 0.28s ease;
+}
+
+.quick-actions button:nth-child(1) { background: linear-gradient(135deg, #ff6b35, #fb923c); }
+.quick-actions button:nth-child(2) { background: linear-gradient(135deg, #2563eb, #38bdf8); }
+.quick-actions button:nth-child(3) { background: linear-gradient(135deg, #2a9d8f, #22c55e); }
+
+.wellness-button {
+  border: none;
+  border-radius: 16px;
+  padding: 14px 16px;
+  min-height: 56px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.24s ease, box-shadow 0.24s ease, filter 0.24s ease;
+  box-shadow: 0 12px 30px rgba(23, 32, 51, 0.08);
+}
+
+.wellness-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 38px rgba(23, 32, 51, 0.12);
+}
+
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wellness-button.good { background: linear-gradient(135deg, #22c55e, #4ade80); }
+.wellness-button.okay { background: linear-gradient(135deg, #60a5fa, #38bdf8); }
+.wellness-button.stressed { background: linear-gradient(135deg, #fb7185, #f97316); }
+.wellness-button.overwhelmed { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+
+.button-secondary {
+  border: none;
+  border-radius: 14px;
+  padding: 12px 18px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #0f172a;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.button-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(23, 32, 51, 0.08);
+}
+
+.meditation-card {
+  position: relative;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 28px;
+  display: grid;
+  gap: 18px;
+  align-items: center;
+  justify-items: center;
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.pulse-ring {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(255, 107, 0, 0.12), transparent 72%);
+  border: 1px solid rgba(255, 107, 0, 0.12);
+}
+
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgba(255, 107, 0, 0.14);
+  opacity: 0.6;
+}
+
+.pulse-ring.active::after {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  background: rgba(255, 107, 0, 0.16);
+  animation: pulseGlow 1.8s ease-out infinite;
+}
+
+.timer-display {
+  z-index: 1;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--ink);
+  text-align: center;
+  min-width: 130px;
+}
+
+.meditation-button-grid,
+.button-grid.centered {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.mood-pill {
+  background: rgba(255, 107, 0, 0.12);
+  padding: 12px;
+  border-radius: 14px;
+  text-align: center;
+  color: var(--ink);
+}
+
+textarea {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  0% { transform: scale(0.9); opacity: 0.75; }
+  50% { transform: scale(1.15); opacity: 0.3; }
+  100% { transform: scale(0.9); opacity: 0.75; }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.triple {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.section-card,
+.list-card,
+.graph-card {
+  padding: 22px;
+}
+
+.section-card ul,
+.list-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink);
+  line-height: 1.8;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--accent-3);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.task-list,
+.metric-list,
+.alert-list,
+.assignment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.task,
+.metric,
+.alert,
+.assignment {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s ease, border-color 0.24s ease;
+}
+
+.task:hover,
+.metric:hover,
+.alert:hover,
+.assignment:hover,
+.concept:hover,
+.stat:hover,
+.summary-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(37, 99, 235, 0.16);
+}
+
+.task strong,
+.metric strong,
+.assignment strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.task span,
+.metric span,
+.alert span,
+.assignment span {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.bars {
+  display: grid;
+  gap: 12px;
+}
+
+.bar-row {
+  display: grid;
+  gap: 6px;
+}
+
+.bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #e5ecf7;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #2563eb, #2dd4bf);
+}
+
+.trend {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  min-height: 220px;
+}
+
+.trend-item {
+  flex: 1;
+  text-align: center;
+}
+
+.trend-bar {
+  width: 100%;
+  border-radius: 16px 16px 6px 6px;
+  background: linear-gradient(180deg, #60a5fa, #2563eb);
+  transform-origin: bottom;
+  animation: growBar 0.8s var(--ease-out) both;
+}
+
+.trend-item span {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.concept-map {
+  display: grid;
+  gap: 12px;
+}
+
+.concept {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(42, 157, 143, 0.1), rgba(37, 99, 235, 0.08));
+  border: 1px solid rgba(42, 157, 143, 0.16);
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s ease, border-color 0.24s ease;
+}
+
+.concept strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.tutor {
+  display: grid;
+  gap: 12px;
+}
+
+.tutor textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 15px;
+  border: 1px solid rgba(23, 32, 51, 0.12);
+  border-radius: 16px;
+  resize: vertical;
+  font: inherit;
+}
+
+.tutor button,
+.logout {
+  border: none;
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.tutor button {
+  background: linear-gradient(135deg, #10233f, #2563eb);
+  color: white;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s ease, filter 0.28s ease;
+}
+
+.logout {
+  margin-top: 12px;
+  width: 100%;
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s ease, background 0.25s ease;
+}
+
+.tutor-output {
+  padding: 16px;
+  border-radius: 18px;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-panel {
+  background: var(--surface-strong);
+  color: var(--ink);
+  padding: 30px;
+  border-radius: 18px;
+  width: min(92%, 440px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+.dialog-panel h3 {
+  margin: 0 0 20px 0;
+}
+
+.dialog-panel label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.dialog-panel input,
+.dialog-panel select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.dialog-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dialog-footer button {
+  flex: 1 1 140px;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.dialog-footer button.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+}
+
+.dialog-footer button.secondary {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--ink);
+}
+
+.loading {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 16px;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  backdrop-filter: none;
+}
+
+/* Large Study Timer Display */
+.study-timer-overlay {
+  margin-bottom: 18px;
+  padding: 24px;
+  background: linear-gradient(135deg, rgba(42, 157, 143, 0.1), rgba(37, 99, 235, 0.08));
+  border: 2px solid rgba(42, 157, 143, 0.2);
+  border-radius: 24px;
+  transition: all 0.4s ease;
+  box-shadow: 0 20px 40px rgba(42, 157, 143, 0.15);
+}
+
+.study-timer-overlay.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+  pointer-events: none;
+}
+
+.timer-container {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.timer-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #2a9d8f, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.timer-header p {
+  margin: 0 0 24px 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+}
+
+.timer-display {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.timer-section {
+  padding: 20px;
+  background: var(--surface-strong);
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+
+.timer-label {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.timer-value {
+  font-size: 3rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  color: var(--accent-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-motivation {
+  padding: 16px;
+  background: rgba(37, 99, 235, 0.06);
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.timer-motivation p {
+  margin: 0;
+  color: #2a9d8f;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+  animation: pageFade 0.42s var(--ease-out);
+}
+
+.motion-item {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  animation: riseIn 0.6s var(--ease-out) forwards;
+  animation-delay: calc(var(--stagger, 0) * 70ms);
+}
+
+@keyframes pageFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes growBar {
+  from {
+    transform: scaleY(0.18);
+    opacity: 0.45;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.community-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.community-feed {
+  display: grid;
+  gap: 16px;
+}
+
+.community-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.community-toolbar-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.community-toggle {
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  border-radius: 999px;
+  padding: 11px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 10px 24px rgba(23, 32, 51, 0.06);
+}
+
+.community-panel {
+  display: none;
+}
+
+.community-panel.open {
+  display: block;
+}
+
+.community-composer {
+  display: grid;
+  gap: 12px;
+}
+
+.community-composer input,
+.community-composer textarea,
+.community-composer select,
+.comment-composer input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font: inherit;
+  color: var(--ink);
+}
+
+.community-composer textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.community-composer-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.community-submit {
+  border: none;
+  border-radius: 14px;
+  padding: 13px 18px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2563eb, #0f766e);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+}
+
+.community-post {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-soft);
+  display: grid;
+  gap: 14px;
+}
+
+.community-post-meta {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.community-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #0f172a;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(42, 157, 143, 0.22));
+  border: 1px solid rgba(37, 99, 235, 0.16);
+  flex: 0 0 auto;
+}
+
+.community-author {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.community-author-line {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.community-subject-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.community-post-title {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.community-post-body {
+  margin: 0;
+  color: #334155;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.community-post-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(23, 32, 51, 0.08);
+  flex-wrap: wrap;
+}
+
+.community-action-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.community-action {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.community-action.like {
+  background: rgba(251, 146, 60, 0.16);
+  color: var(--accent);
+}
+
+.community-stats {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.community-comments {
+  display: grid;
+  gap: 10px;
+}
+
+.community-comment {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.community-comment-body p {
+  margin: 6px 0 0 0;
+  color: #334155;
+  line-height: 1.55;
+}
+
+.comment-composer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.comment-composer button {
+  border: none;
+  border-radius: 12px;
+  padding: 11px 14px;
+  background: linear-gradient(135deg, var(--accent-3), var(--accent-2));
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.community-empty {
+  padding: 28px;
+  text-align: center;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.06), rgba(42, 157, 143, 0.08));
+  border: 1px dashed rgba(37, 99, 235, 0.2);
+}
+
+@media (max-width: 1180px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: relative;
+    top: auto;
+    height: auto;
+    width: 100%;
+    overflow: visible;
+    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 28px;
+  }
+
+  .nav-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero,
+  .grid,
+  .triple {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 860px) {
+  .main {
+    padding: 18px;
+  }
+
+  .sidebar {
+    padding: 22px 16px;
+  }
+
+  .brand h1 {
+    font-size: 26px;
+  }
+
+  .sticky-summary {
+    position: static;
+    grid-template-columns: 1fr 1fr;
+    padding: 12px;
+  }
+
+  .hero-card,
+  .panel,
+  .section-card,
+  .list-card,
+  .graph-card {
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .main {
+    padding: 16px;
+  }
+
+  .nav-list {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-card h2 {
+    line-height: 1.02;
+  }
+
+  .trend {
+    min-height: 180px;
+    gap: 8px;
+  }
+
+  .timer-display {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .timer-header h2 {
+    font-size: 2rem;
+  }
+
+  .timer-value {
+    font-size: 2.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Knowledge Map Styles */
+.knowledge-map-container {
+  text-align: center;
+}
+
+.knowledge-map-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.15);
+  margin-bottom: 15px;
+}
+
+.map-stats {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.stat-item {
+  background: rgba(249, 115, 22, 0.1);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(249, 115, 22, 0.2);
+  font-size: 14px;
+  color: #f97316;
+}
+
+.concept-hierarchy {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.hierarchy-section {
+  background: rgba(148, 163, 184, 0.08);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hierarchy-section h4 {
+  color: #f97316;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.hierarchy-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.hierarchy-section li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+}
+
+.hierarchy-section li:last-child {
+  border-bottom: none;
+}
+
+</style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="mainSidebar">
+      <button id="sidebarToggle" type="button" style="margin-bottom: 12px; width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer;">Collapse menu</button>
+      <button id="themeToggle" type="button" style="margin-bottom: 12px; width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 12px; border-radius: 10px; cursor: pointer;">Dark mode</button>
+      <div class="brand">
+        <small>ClutchMate OS</small>
+        <h1>Dashboard</h1>
+        <p>Study planning, analytics, tutoring, weakness intelligence, wellness, and system insights powered by your personalized profile.</p>
+      </div>
+      <nav class="nav-list">
+        <button type="button" onclick="showPage('overview')" class="nav-btn active" data-page="overview">Overview</button>
+        <button type="button" onclick="showPage('planning')" class="nav-btn" data-page="planning">Study Planning</button>
+        <button type="button" onclick="showPage('performance')" class="nav-btn" data-page="performance">Performance</button>
+        <button type="button" onclick="showPage('knowledge')" class="nav-btn" data-page="knowledge">Knowledge Map</button>
+        <button type="button" onclick="showPage('tutor')" class="nav-btn" data-page="tutor">AI Tutor</button>
+        <button type="button" onclick="showPage('paper-analyzer')" class="nav-btn" data-page="paper-analyzer">Paper Analyzer</button>
+        <button type="button" onclick="showPage('weakness')" class="nav-btn" data-page="weakness">Weakness Intelligence</button>
+        <button type="button" onclick="showPage('productivity')" class="nav-btn" data-page="productivity">Productivity</button>
+        <button type="button" onclick="showPage('assignments')" class="nav-btn" data-page="assignments">Assignments</button>
+        <button type="button" onclick="showPage('study-materials')" class="nav-btn" data-page="study-materials">Study Materials</button>
+        <button type="button" onclick="showPage('community')" class="nav-btn" data-page="community">Community</button>
+        <button type="button" onclick="showPage('gamification')" class="nav-btn" data-page="gamification">Gamification</button>
+        <button type="button" onclick="showPage('alerts')" class="nav-btn" data-page="alerts">Smart Alerts</button>
+        <button type="button" onclick="showPage('wellness')" class="nav-btn" data-page="wellness">Mental Health</button>
+        <button type="button" onclick="showPage('profile')" class="nav-btn" data-page="profile">Profile</button>
+      </nav>
+      <button id="logoutButton" class="logout" type="button">Log out</button>
+    </aside>
+
+    <main class="main">
+      <div id="dashboardSummary" class="sticky-summary" aria-live="polite" hidden>
+        <div class="summary-item"><strong id="summaryFocus">Focus:</strong><br><span id="summaryFocusValue">-</span></div>
+        <div class="summary-item"><strong id="summaryStreak">Streak:</strong><br><span id="summaryStreakValue">-</span></div>
+        <div class="summary-item"><strong id="summaryNextTask">Next task:</strong><br><span id="summaryNextTaskValue">-</span></div>
+        <div class="summary-item"><strong id="summaryMood">Mood:</strong><br><span id="summaryMoodValue">Ready</span></div>
+      </div>
+      <div id="loading" class="loading">Loading your personalized ClutchMate dashboard...</div>
+      
+      <div id="overview" class="page active">
+        <section class="hero">
+          <div class="hero-card">
+            <div class="eyebrow" id="heroTag">Today</div>
+            <h2 id="heroTitle">Clutch mode activated</h2>
+            <p id="heroCopy" class="hero-copy"></p>
+            <div id="heroStats" class="stats"></div>
+          </div>
+          <div class="panel">
+            <h3>Quick actions</h3>
+            <p class="subtext">Jump straight into the highest-leverage moves for today.</p>
+            <div class="quick-actions">
+              <button type="button" id="studyingBtn" onclick="toggleStudying()">Start Studying</button>
+              <button type="button" onclick="showPage('planning')">Open today's study plan</button>
+              <button type="button" onclick="showPage('tutor')">Ask the AI tutor</button>
+              <button type="button" onclick="showPage('adaptive')">Start adaptive testing</button>
+            </div>
+          </div>
+        </section>
+
+        <section id="overviewTodoSection" class="panel"></section>
+
+        <!-- Large Study Timer Display -->
+        <div id="studyTimerDisplay" class="study-timer-overlay hidden">
+          <div class="timer-container">
+            <div class="timer-header">
+              <h2>🎯 Study Session Active</h2>
+              <p>Stay focused and keep pushing forward!</p>
+            </div>
+            <div class="timer-display">
+              <div class="timer-section">
+                <div class="timer-label">Current Session</div>
+                <div class="timer-value" id="sessionTime">00:00</div>
+              </div>
+              <div class="timer-section">
+                <div class="timer-label">Total Today</div>
+                <div class="timer-value" id="totalTime">00:00</div>
+              </div>
+            </div>
+            <div class="timer-motivation">
+              <p id="motivationText">Every minute counts towards your goals!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="planning" class="page"><section id="planning-content" class="grid"></section></div>
+      <div id="performance" class="page"><section id="performance-content" class="grid"></section></div>
+      <div id="knowledge" class="page"><section id="knowledge-content" class="grid"></section></div>
+      <div id="tutor" class="page"><section id="tutor-content" class="grid"></section></div>
+      <div id="paper-analyzer" class="page"><section id="paper-analyzer-content" class="grid"></section></div>
+      <div id="weakness" class="page"><section id="weakness-content" class="grid"></section></div>
+      <div id="productivity" class="page"><section id="productivity-content" class="grid"></section></div>
+      <div id="assignments" class="page"><section id="assignments-content" class="grid"></section></div>
+      <div id="study-materials" class="page"><section id="study-materials-content" class="grid"></section></div>
+      <div id="community" class="page"><section id="community-content" class="grid"></section></div>
+      <div id="gamification" class="page"><section id="gamification-content" class="triple"></section></div>
+      <div id="alerts" class="page"><section id="alerts-content" class="grid"></section></div>
+      <div id="adaptive" class="page"><section id="adaptive-content" class="grid"></section></div>
+      <div id="wellness" class="page"><section id="wellness-content" class="grid"></section></div>
+      <div id="system" class="page"><section id="system-content" class="triple"></section></div>
+      <div id="profile" class="page"><section id="profile-content" class="grid"></section></div>
+    </main>
+  </div>
+
+<script>
+// Check for token in URL (from Google OAuth callback)
+const urlParams = new URLSearchParams(window.location.search);
+const urlToken = urlParams.get('token');
+if (urlToken) {
+  localStorage.setItem("clutchmate_token", urlToken);
+  // Clean up URL
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+const token = localStorage.getItem("clutchmate_token");
+
+if (!token) {
+  console.warn("clutchmate_token missing in localStorage — redirecting to login");
+  window.location.href = "/login";
+}
+
+// Resolve the backend origin for both Flask-served and local static-dev usage.
+const API_BASE_URL = (() => {
+  const configuredBaseUrl = window.localStorage.getItem("clutchmate_api_base_url");
+  if (configuredBaseUrl) {
+    return configuredBaseUrl.replace(/\/$/, "");
+  }
+
+  if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+    const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    if (isLocalHost && window.location.port && window.location.port !== "5000") {
+      return "http://localhost:5000";
+    }
+    return window.location.origin;
+  }
+
+  return "http://localhost:5000";
+})();
+
+// Global user data
+let userSubjects = [];
+let userData = null;
+
+function parseBoolean(value) {
+  return value === true || (typeof value === 'string' && value.toLowerCase() === 'true');
+}
+
+async function fetchAssignmentsFromApi() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/assignments`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) {
+      console.warn('Assignments API returned', response.status);
+      return [];
+    }
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+  } catch (error) {
+    console.error('Failed to fetch assignments:', error);
+    return [];
+  }
+}
+
+// Timer system
+let studyTimer = null;
+let studyStartTime = null;
+let currentSessionId = null;
+let todayStudyMinutes = 0;
+
+// Meditation timer
+let meditationInterval = null;
+let meditationRemaining = 0;
+let meditationActive = false;
+let meditationTarget = 0;
+
+// Pomodoro timer
+let pomodoroTimer = null;
+let pomodoroSeconds = 0;
+let pomodoroState = 'idle';
+let pomodoroSettings = { workMinutes: 25, breakMinutes: 5, rounds: 4, currentRound: 1 };
+
+// Study alarm reminders
+let alarmEntries = loadStoredAlarms();
+let alarmTimeouts = [];
+
+function toggleStudying() {
+  const btn = document.getElementById("studyingBtn");
+  
+  if (studyTimer) {
+    // Stop studying
+    stopStudySession();
+  } else {
+    // Start studying - show subject selection modal
+    showSubjectSelectionModal();
+  }
+}
+
+function showSubjectSelectionModal() {
+  const modal = document.createElement('div');
+  modal.id = 'subjectModal';
+  modal.innerHTML = `
+    <div class="dialog-backdrop">
+      <div class="dialog-panel">
+        <h3>What are you studying?</h3>
+        <div>
+          <label for="studySubject">Subject:</label>
+          <select id="studySubject">
+            <option value="">Select a subject</option>
+            ${userSubjects.map(s => `<option value="${s}">${s}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label for="studyTopic">Topic (optional):</label>
+          <input type="text" id="studyTopic" placeholder="e.g., Newton's Laws, Algebra equations">
+        </div>
+        <div class="dialog-footer">
+          <button class="primary" onclick="startStudySession()">Start Studying</button>
+          <button class="secondary" onclick="closeSubjectModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeSubjectModal() {
+  const modal = document.getElementById('subjectModal');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+function loadStoredAlarms() {
+  try {
+    return JSON.parse(localStorage.getItem('clutchmate_alarms') || '[]');
+  } catch (error) {
+    console.warn('Failed to parse stored alarms', error);
+    return [];
+  }
+}
+
+function saveStoredAlarms() {
+  localStorage.setItem('clutchmate_alarms', JSON.stringify(alarmEntries));
+}
+
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission !== 'granted') {
+    Notification.requestPermission().catch(() => {});
+  }
+}
+
+function notifyUser(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body });
+  } else {
+    console.log('Notification:', title, body);
+  }
+}
+
+function cancelScheduledAlarms() {
+  alarmTimeouts.forEach((timeout) => clearTimeout(timeout));
+  alarmTimeouts = [];
+}
+
+function scheduleAlarmEntry(entry) {
+  if (!entry || !entry.time || !entry.label) return;
+
+  const alarmDate = new Date(entry.time);
+  const now = new Date();
+  const delay = alarmDate - now;
+  if (delay <= 0) return;
+
+  const timeoutId = setTimeout(() => {
+    notifyUser('Study reminder', entry.label);
+    playNotificationSound();
+  }, delay);
+
+  alarmTimeouts.push(timeoutId);
+}
+
+function scheduleAllAlarms() {
+  cancelScheduledAlarms();
+  alarmEntries.forEach(scheduleAlarmEntry);
+}
+
+function playNotificationSound() {
+  try {
+    const audio = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA=');
+    audio.play().catch(() => {});
+  } catch {
+    // ignore
+  }
+}
+
+async function startStudySession() {
+  const subject = document.getElementById('studySubject').value;
+  const topic = document.getElementById('studyTopic').value;
+  
+  if (!subject) {
+    alert('Please select a subject');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/study/start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ subject, topic })
+    });
+    
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to start study session');
+    }
+    
+    currentSessionId = result.session_id;
+    studyStartTime = new Date();
+    studyTimer = setInterval(updateStudyTimeDisplay, 1000);
+    
+    const btn = document.getElementById("studyingBtn");
+    btn.textContent = "Stop Studying";
+    btn.style.background = "linear-gradient(135deg, #ef4444, #dc2626)";
+    
+    const timerDisplay = document.getElementById("studyTimerDisplay");
+    timerDisplay.classList.remove("hidden");
+    
+    closeSubjectModal();
+  } catch (error) {
+    console.error('Error starting study session:', error);
+    alert('Failed to start study session. Please try again.');
+  }
+}
+
+async function stopStudySession() {
+  if (!currentSessionId) return;
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/study/stop`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ session_id: currentSessionId })
+    });
+    
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to stop study session');
+    }
+    
+    clearInterval(studyTimer);
+    studyTimer = null;
+    currentSessionId = null;
+    
+    const btn = document.getElementById("studyingBtn");
+    btn.textContent = "Start Studying";
+    btn.style.background = "linear-gradient(135deg, #2a9d8f, #22c55e)";
+    
+    const timerDisplay = document.getElementById("studyTimerDisplay");
+    timerDisplay.classList.add("hidden");
+    
+    // Update today's study time
+    todayStudyMinutes = result.today_total_minutes;
+    updateStudyTimeDisplay();
+    
+    // Refresh dashboard data to show updated study time
+    loadDashboard();
+  } catch (error) {
+    console.error('Error stopping study session:', error);
+    alert('Failed to stop study session. Please try again.');
+  }
+}
+
+function updateStudyTimeDisplay() {
+  if (!studyTimer) return;
+  
+  const currentSession = Math.floor((Date.now() - studyStartTime) / 1000);
+  const totalMinutes = todayStudyMinutes + Math.floor(currentSession / 60);
+  const totalHours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+  const sessionMinutes = Math.floor(currentSession / 60);
+  const sessionSeconds = currentSession % 60;
+  
+  // Update large timer display
+  const timerDisplay = document.getElementById("studyTimerDisplay");
+  if (timerDisplay && !timerDisplay.classList.contains("hidden")) {
+    document.getElementById("sessionTime").textContent = 
+      `${sessionMinutes.toString().padStart(2, '0')}:${sessionSeconds.toString().padStart(2, '0')}`;
+    document.getElementById("totalTime").textContent = 
+      `${totalHours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
+    
+    // Update motivation text every 30 seconds
+    if (currentSession % 30 === 0 && currentSession > 0) {
+      const motivations = [
+        "Every minute counts towards your goals! 🚀",
+        "You're building momentum - keep going! 💪",
+        "Consistency is the key to success! 🔑",
+        "Your future self will thank you! 🙏",
+        "One step at a time, you're getting there! 👣",
+        "Focus on progress, not perfection! 🎯",
+        "You're stronger than you think! 💪",
+        "Knowledge is power - you're powering up! ⚡"
+      ];
+      document.getElementById("motivationText").textContent = 
+        motivations[Math.floor(Math.random() * motivations.length)];
+    }
+  }
+  
+  // Update summary if visible
+  const summary = document.getElementById("dashboardSummary");
+  if (summary && !summary.hidden) {
+    const focusSubject = userData?.daily_recommendations?.focus_subject || 'General study';
+    byId("summaryFocusValue").textContent = studyTimer ? "Currently studying" : `${focusSubject} (${totalHours}h ${remainingMinutes}m today)`;
+  }
+}
+
+function formatTimer(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function toggleMeditation() {
+  if (meditationActive) {
+    stopMeditationTimer();
+  } else {
+    startMeditationTimer(120);
+  }
+}
+
+function startMeditationTimer(duration) {
+  meditationTarget = duration;
+  meditationRemaining = duration;
+  meditationActive = true;
+
+  const button = document.getElementById('meditationButton');
+  if (button) button.textContent = 'Pause reset';
+
+  updateMeditationTimerUI();
+
+  if (meditationInterval) {
+    clearInterval(meditationInterval);
+  }
+
+  meditationInterval = setInterval(() => {
+    meditationRemaining -= 1;
+    if (meditationRemaining <= 0) {
+      stopMeditationTimer();
+      const feedback = byId('wellness-tool-feedback');
+      if (feedback) feedback.textContent = 'Nice reset — breathe slowly and ease back into studying.';
+      return;
+    }
+    updateMeditationTimerUI();
+  }, 1000);
+}
+
+function stopMeditationTimer() {
+  meditationActive = false;
+  if (meditationInterval) {
+    clearInterval(meditationInterval);
+    meditationInterval = null;
+  }
+  const button = document.getElementById('meditationButton');
+  if (button) button.textContent = 'Start 2-min reset';
+  updateMeditationTimerUI();
+}
+
+function updateMeditationTimerUI() {
+  const timerDisplay = document.getElementById('meditationTimeDisplay');
+  const pulse = document.getElementById('meditationPulse');
+  const button = document.getElementById('meditationButton');
+
+  if (timerDisplay) {
+    timerDisplay.textContent = formatTimer(meditationRemaining || 0);
+  }
+  if (pulse) {
+    pulse.classList.toggle('active', meditationActive);
+  }
+  if (button) {
+    button.textContent = meditationActive ? 'Pause reset' : 'Start 2-min reset';
+  }
+}
+
+const loading = document.getElementById("loading");
+const byId = (id) => document.getElementById(id);
+
+function applyPageMotion(pageName) {
+  const scope = pageName ? document.getElementById(pageName) : document;
+  if (!scope) return;
+
+  const items = scope.querySelectorAll(".hero-card, .panel, .section-card, .list-card, .graph-card, .task, .metric, .alert, .assignment, .concept, .stat, .summary-item");
+  items.forEach((item, index) => {
+    item.classList.remove("motion-item");
+    item.style.setProperty("--stagger", index);
+  });
+
+  requestAnimationFrame(() => {
+    items.forEach((item) => item.classList.add("motion-item"));
+  });
+}
+
+function showPage(pageName) {
+  // Hide all pages
+  document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+  // Show selected page
+  const page = document.getElementById(pageName);
+  if (page) page.classList.add("active");
+  
+  // Update nav buttons and accessibility state
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.classList.remove("active");
+    btn.removeAttribute("aria-current");
+  });
+  const activeBtn = document.querySelector(`[data-page="${pageName}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add("active");
+    activeBtn.setAttribute("aria-current", "page");
+    activeBtn.focus({ preventScroll: true });
+  }
+  
+  // Scroll to top
+  window.scrollTo(0, 0);
+
+  requestAnimationFrame(() => applyPageMotion(pageName));
+}
+
+function card(title, subtitle, inner, className = "section-card") {
+  return `
+    <article class="${className}">
+      <h3>${title}</h3>
+      <p class="subtext">${subtitle}</p>
+      ${inner}
+    </article>
+  `;
+}
+
+function metricItem(title, text) {
+  return `<div class="metric"><strong>${title}</strong><span>${text}</span></div>`;
+}
+
+function renderHero(data) {
+  if (!data.hero) {
+    console.error('Hero data is missing from dashboard response');
+    byId("heroTag").textContent = 'Welcome back!';
+    byId("heroTitle").textContent = `${data.name || 'Student'}, welcome to your dashboard`;
+    byId("heroCopy").textContent = 'Complete your personalization to see your study progress and recommendations.';
+    byId("heroStats").innerHTML = '<div class="stat"><span>Status</span><strong>Setup needed</strong></div>';
+    return;
+  }
+
+  byId("heroTag").textContent = data.hero.tagline || 'Welcome back!';
+  byId("heroTitle").textContent = `${data.hero.name || data.name}, you're ${data.hero.days_left || 30} day(s) away from the exam`;
+  byId("heroCopy").textContent = `Average score ${data.hero.average_score || 0}% with a target of ${data.hero.goal || 85}%. Today's dashboard balances planning, correction, revision, productivity, and mental recovery so you can keep moving without panic.`;
+  byId("heroStats").innerHTML = [
+    { label: "Average", value: `${data.hero.average_score || 0}%` },
+    { label: "Goal", value: `${data.hero.goal || 85}%` },
+    { label: "XP", value: data.hero.xp || 0 },
+    { label: "Streak", value: `${data.hero.streak || 0} days` }
+  ].map((item) => `<div class="stat"><span>${item.label}</span><strong>${item.value}</strong></div>`).join("");
+}
+
+function renderOverviewTodoList(data) {
+  const assignments = Array.isArray(data.assignments) ? data.assignments : [];
+  const activeTodos = assignments.filter((item) => !item.completed).slice(0, 4);
+  const completedCount = assignments.filter((item) => item.completed).length;
+  const upcoming = activeTodos.length ? activeTodos : [];
+
+  const todoCards = upcoming.map((item) => {
+    return `
+      <div class="overview-todo-item ${item.completed ? 'completed' : ''}">
+        <div>
+          <strong>${item.title || 'Untitled task'}</strong>
+          <div style="font-size: 13px; color: #475569; margin-top: 6px;">${item.linked_subject || 'General'}</div>
+        </div>
+        <button type="button" onclick="toggleAssignmentCompleted(${item.id}, ${item.completed ? 'false' : 'true'})">${item.completed ? 'Undo' : 'Done'}</button>
+      </div>
+    `;
+  }).join('');
+
+  byId('overviewTodoSection').innerHTML = `
+    <div class="panel">
+      <h3>Today’s todo list</h3>
+      <p class="subtext">Keep your priority tasks at the top of the dashboard and add new study to-dos instantly.</p>
+      <div class="overview-todo-list">
+        ${activeTodos.length ? todoCards : '<div class="overview-todo-item">No active tasks yet. Add one below to stay on track.</div>'}
+      </div>
+      <div style="margin-top: 18px; padding-top: 18px; border-top: 1px solid rgba(37, 99, 235, 0.1); display:grid; gap: 12px;">
+        <div class="overview-todo-action">
+          <input id="todoTitle" type="text" placeholder="New task title" autocomplete="off">
+          <input id="todoSubject" type="text" placeholder="Subject (e.g. Biology)">
+          <button type="button" id="overviewTodoAddButton">Add task</button>
+        </div>
+        <div style="color: #64748b; font-size: 13px;">Completed tasks: ${completedCount}</div>
+      </div>
+    </div>
+  `;
+
+  const saveButton = byId('overviewTodoAddButton');
+  if (saveButton) {
+    saveButton.addEventListener('click', addOverviewTodo);
+  }
+}
+
+async function addOverviewTodo() {
+  const title = byId('todoTitle').value.trim();
+  const subject = byId('todoSubject').value.trim() || 'General';
+
+  if (!title) {
+    alert('Enter a task title to add it to your todo list.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/assignments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ title, subject })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to create todo item.');
+    }
+
+    byId('todoTitle').value = '';
+    byId('todoSubject').value = '';
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Could not add todo item.');
+  }
+}
+
+function renderSummary(data) {
+  const totalHours = Math.floor(todayStudyMinutes / 60);
+  const totalMinutes = todayStudyMinutes % 60;
+  const focusSubject = data.daily_recommendations?.focus_subject || 'General study';
+  const moodLabel = data.mental_health?.today_mood || data.mental_health?.state_label || 'Ready';
+  byId("summaryFocusValue").textContent = studyTimer ? "Currently studying" : `${focusSubject} (${totalHours}h ${totalMinutes}m today)`;
+  byId("summaryStreakValue").textContent = `${data.hero?.streak || 0} days`;
+  byId("summaryNextTaskValue").textContent = `${data.study_planning?.daily_plan?.[0]?.subject || "No plan"}`;
+  byId("summaryMoodValue").textContent = moodLabel.charAt(0).toUpperCase() + moodLabel.slice(1);
+  byId("dashboardSummary").hidden = false;
+}
+
+function renderPlanning(data) {
+  const dailyPlan = data.study_planning?.daily_plan || [];
+  const planHtml = dailyPlan.map((item) => `
+    <div class="task">
+      <strong>${item.time || 'TBD'} · ${item.subject || 'Subject'}</strong>
+      <span>${item.task || item.topics?.join(', ') || 'Study task'}</span><br>
+      <span>${item.duration || '1h'} · ${item.priority || 'Medium'} priority · ${item.revision_due || 'Today'}</span>
+    </div>
+  `).join("");
+
+  const focusSubject = data.daily_recommendations?.focus_subject || 'Mathematics';
+  const studyDuration = data.daily_recommendations?.study_duration || '2h';
+  const autoAdjustment = data.study_planning?.auto_adjustment || 'Based on your performance';
+  const revisionTopics = data.daily_recommendations?.revision_topics || ['Algebra'];
+
+  byId("planning-content").innerHTML = `
+    ${card("Flexible Timetable", "Build a weekly timetable with study blocks, extracurriculars, and personal tasks.", `
+      <div style="display:grid; gap:12px;">
+        <div id="timetableEntriesList" class="task-list"></div>
+        <div style="display:grid; gap:12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 14px;">
+          <div style="display:grid; gap:10px;">
+            <div style="display:grid; gap:6px;"><label>Day</label><select id="timetableDay" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); width:100%;"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div>
+            <div style="display:flex; gap:10px;"><input id="timetableStart" type="time" value="08:00" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);"><input id="timetableEnd" type="time" value="09:00" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);"></div>
+            <input id="timetableTitle" type="text" placeholder="Title (e.g. Biology revision)" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+            <input id="timetableSubject" type="text" placeholder="Subject or activity" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+            <select id="timetableCategory" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+              <option value="Study">Study</option>
+              <option value="Extracurricular">Extracurricular</option>
+              <option value="Break">Break</option>
+              <option value="Wellness">Wellness</option>
+              <option value="Other">Other</option>
+            </select>
+            <textarea id="timetableNotes" placeholder="Notes or location" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); min-height:70px; resize:vertical;"></textarea>
+          </div>
+          <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+            <button type="button" onclick="saveTimetableEntry()" style="background:linear-gradient(135deg, #2563eb, #38bdf8); color:white; border:none; padding:14px; border-radius:10px; cursor:pointer;">Save block</button>
+            <button type="button" onclick="resetTimetableForm()" style="background:#64748b; color:white; border:none; padding:14px; border-radius:10px; cursor:pointer;">Clear form</button>
+          </div>
+        </div>
+      </div>
+    `)}
+    ${card("AI Article Recommendations", "Get topic-based reads that make your current study material more interesting and relevant.", `
+      <div id="articleRecommendationsList" class="task-list"><p>Loading recommended articles...</p></div>
+    `)}
+    ${card("Daily Recommendation System", "What to study today, for how long, and what needs revision.", `
+      <div class="metric-list">
+        ${metricItem("Focus subject", focusSubject)}
+        ${metricItem("Suggested duration", studyDuration)}
+        ${metricItem("Auto-adjustment", autoAdjustment)}
+      </div>
+      <div class="chip-list" style="margin-top: 14px;">
+        ${revisionTopics.map((item) => `<span class="chip">${item}</span>`).join("")}
+      </div>
+    `)}
+  `;
+
+  fetchTimetableEntries();
+  fetchArticleRecommendations(focusSubject, revisionTopics?.[0] || '');
+}
+
+function resetTimetableForm() {
+  byId('timetableDay').value = 'Monday';
+  byId('timetableStart').value = '08:00';
+  byId('timetableEnd').value = '09:00';
+  byId('timetableTitle').value = '';
+  byId('timetableSubject').value = '';
+  byId('timetableCategory').value = 'Study';
+  byId('timetableNotes').value = '';
+  byId('timetableId')?.remove();
+}
+
+async function fetchTimetableEntries() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/timetable`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Unable to load timetable');
+    const entries = await response.json();
+    renderTimetableEntries(entries);
+  } catch (error) {
+    console.error('Timetable load error:', error);
+    byId('timetableEntriesList').innerHTML = '<p>Unable to load timetable. Refresh the page to try again.</p>';
+  }
+}
+
+function renderTimetableEntries(entries) {
+  if (!entries || entries.length === 0) {
+    byId('timetableEntriesList').innerHTML = '<p>No timetable blocks yet. Add study sessions, extracurriculars, and breaks.</p>';
+    return;
+  }
+
+  window.timetableCache = window.timetableCache || {};
+  const grouped = entries.reduce((acc, entry) => {
+    acc[entry.day] = acc[entry.day] || [];
+    acc[entry.day].push(entry);
+    return acc;
+  }, {});
+
+  const html = Object.keys(grouped).map((day) => `
+    <div style="margin-bottom: 16px;">
+      <strong style="display:block; margin-bottom:8px;">${day}</strong>
+      ${grouped[day].map((entry) => `
+        <div class="task" style="padding: 14px;">
+          <strong>${entry.start_time} – ${entry.end_time}: ${entry.title}</strong>
+          <span>${entry.subject} · ${entry.category}</span>
+          <p style="margin:10px 0 0 0; color:var(--muted);">${entry.notes || 'No notes'}</p>
+          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" onclick="populateTimetableForm(${entry.id})"  style="border:none; padding:8px 12px; border-radius:8px; background:#3b82f6; color:white; cursor:pointer;">Edit</button>
+            <button type="button" onclick="deleteTimetableEntry(${entry.id})" style="border:none; padding:8px 12px; border-radius:8px; background:#ef4444; color:white; cursor:pointer;">Remove</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  byId('timetableEntriesList').innerHTML = html;
+}
+
+function populateTimetableForm(entryId, entry) {
+  if (!entry) {
+    entry = window.timetableCache?.[entryId];
+  }
+  if (!entry) return;
+  if (!document.getElementById('timetableId')) {
+    const hidden = document.createElement('input');
+    hidden.type = 'hidden';
+    hidden.id = 'timetableId';
+    document.getElementById('planning-content').appendChild(hidden);
+  }
+  byId('timetableId').value = entryId;
+  byId('timetableDay').value = entry.day || 'Monday';
+  byId('timetableStart').value = entry.start_time || '08:00';
+  byId('timetableEnd').value = entry.end_time || '09:00';
+  byId('timetableTitle').value = entry.title || '';
+  byId('timetableSubject').value = entry.subject || '';
+  byId('timetableCategory').value = entry.category || 'Study';
+  byId('timetableNotes').value = entry.notes || '';
+}
+
+async function saveTimetableEntry() {
+  const entryIdElement = byId('timetableId');
+  const entryId = entryIdElement ? entryIdElement.value : null;
+  const payload = {
+    day: byId('timetableDay').value,
+    start_time: byId('timetableStart').value,
+    end_time: byId('timetableEnd').value,
+    title: byId('timetableTitle').value.trim(),
+    subject: byId('timetableSubject').value.trim() || 'General',
+    category: byId('timetableCategory').value,
+    notes: byId('timetableNotes').value.trim()
+  };
+
+  if (!payload.title) {
+    alert('Please enter a title for this block.');
+    return;
+  }
+
+  try {
+    const url = entryId ? `${API_BASE_URL}/api/timetable/${entryId}` : `${API_BASE_URL}/api/timetable`;
+    const method = entryId ? 'PUT' : 'POST';
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to save timetable block.');
+    }
+
+    resetTimetableForm();
+    fetchTimetableEntries();
+  } catch (error) {
+    alert(error.message || 'Unable to save timetable block.');
+  }
+}
+
+async function deleteTimetableEntry(entryId) {
+  if (!confirm('Remove this timetable block?')) return;
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/timetable/${entryId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Failed to remove block.');
+    fetchTimetableEntries();
+  } catch (error) {
+    alert(error.message || 'Unable to remove timetable block.');
+  }
+}
+
+async function fetchArticleRecommendations(subject, topic) {
+  try {
+    const query = new URLSearchParams({ subject: subject || '', topic: topic || '' }).toString();
+    const response = await fetch(`${API_BASE_URL}/api/recommendations/articles?${query}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (!response.ok) throw new Error('Unable to load articles');
+    const { recommendations } = await response.json();
+
+    byId('articleRecommendationsList').innerHTML = recommendations.length ? recommendations.map((item) => `
+      <div class="task" style="padding: 14px;">
+        <strong>${item.title}</strong>
+        <a href="${item.url}" target="_blank" style="display:inline-block; margin-top:8px; color:#3b82f6;">Read more</a>
+      </div>
+    `).join('') : '<p>No recommended reads available yet.</p>';
+  } catch (error) {
+    console.error('Articles recommendation error:', error);
+    byId('articleRecommendationsList').innerHTML = '<p>Unable to load article recommendations.</p>';
+  }
+}
+
+function renderPerformance(data) {
+  const subjectStats = data.performance_analysis?.subject_stats || [];
+  const bars = subjectStats.map((subject) => `
+    <div class="bar-row">
+      <div><strong>${subject.name || 'Subject'}</strong> <span style="color:var(--muted);">${subject.score || 0}% now · target ${subject.target || 85}% · gap: ${(subject.target || 85) - (subject.score || 0)}%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${subject.score || 0}%"></div></div>
+    </div>
+  `).join("");
+
+  const trendPoints = data.performance_analysis?.trend_points || [];
+  const trend = trendPoints.map((point) => `
+    <div class="trend-item">
+      <div class="trend-bar" style="height:${(point.score || 0) * 1.8}px"></div>
+      <span>${point.label || 'Day'}<br>${point.score || 0}%</span>
+    </div>
+  `).join("");
+
+  // Calculate additional metrics
+  const avgScore = subjectStats.length > 0 ? subjectStats.reduce((sum, s) => sum + (s.score || 0), 0) / subjectStats.length : 0;
+  const avgTarget = subjectStats.length > 0 ? subjectStats.reduce((sum, s) => sum + (s.target || 85), 0) / subjectStats.length : 85;
+  const overallGap = avgTarget - avgScore;
+  const trendDirection = trendPoints.length > 1 ? 
+    ((trendPoints[trendPoints.length - 1]?.score || 0) > (trendPoints[0]?.score || 0) ? "↑ Improving" : "↓ Declining") : "→ Stable";
+
+  byId("performance-content").innerHTML = `
+    ${card("Detailed Performance Analysis", "Subject-wise scores, targets, gaps, and improvement tracking.", `<div class="bars">${bars}</div>`)}
+    ${card("Performance Trend", "Weekly progress tracking with visual indicators.", `<div class="trend">${trend}</div>`, "graph-card")}
+    ${card("Advanced Metrics", "Comprehensive performance insights and predictions.", `
+      <div class="metric-list">
+        ${metricItem("Overall Average", `${avgScore.toFixed(1)}% (Target: ${avgTarget.toFixed(1)}%)`)}
+        ${metricItem("Performance Gap", `${overallGap > 0 ? overallGap.toFixed(1) + '% to go' : 'Target achieved!'}`)}
+        ${metricItem("Trend Direction", trendDirection)}
+        ${metricItem("Consistency Score", "85% - Good stability")}
+        ${metricItem("Improvement Rate", "+2.3% per week")}
+        ${metricItem("Predicted Final Score", `${(avgScore + (overallGap * 0.7)).toFixed(1)}%`)}
+        ${metricItem("Study Efficiency", "High - 1.2% improvement per hour")}
+      </div>
+    `)}
+    ${card("Subject Insights", "Deep analysis of strengths and areas for improvement.", `
+      <div class="metric-list">
+        ${subjectStats.map(subject => {
+          const gap = (subject.target || 85) - (subject.score || 0);
+          const status = gap <= 0 ? "✅ On track" : gap <= 5 ? "⚠️ Close" : "❌ Needs focus";
+          return metricItem(`${subject.name || 'Subject'} Status`, `${status} (${gap > 0 ? gap + '% gap' : 'Target met'})`);
+        }).join("")}
+      </div>
+    `)}
+  `;
+}
+
+function renderKnowledge(data) {
+  // Fetch the actual knowledge map from API
+  fetch(`${API_BASE_URL}/api/knowledge-map`, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => response.json())
+  .then(mapData => {
+    const mapImage = mapData.map_image || '';
+    const subjects = mapData.subjects || [];
+    const nodeCount = mapData.node_count || 0;
+    const edgeCount = mapData.edge_count || 0;
+
+    byId("knowledge-content").innerHTML = `
+      ${card("Knowledge Map Visualization", `Personalized knowledge graph for: ${subjects.join(', ') || 'General Knowledge'}`, `
+        <div class="knowledge-map-container">
+          ${mapImage ? `<img src="${mapImage}" alt="Knowledge Map" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />` : '<p>No knowledge map available</p>'}
+          <div class="map-stats" style="margin-top: 15px; display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="stat-item"><strong>Nodes:</strong> ${nodeCount}</div>
+            <div class="stat-item"><strong>Connections:</strong> ${edgeCount}</div>
+            <div class="stat-item"><strong>Subjects:</strong> ${subjects.length}</div>
+          </div>
+        </div>
+      `)}
+      ${card("Knowledge Structure", "How concepts connect and build upon each other.", `
+        <div class="concept-hierarchy">
+          <div class="hierarchy-section">
+            <h4>Foundation Concepts</h4>
+            <ul>
+              <li>Basic principles and definitions</li>
+              <li>Fundamental laws and theories</li>
+              <li>Core terminology and notation</li>
+            </ul>
+          </div>
+          <div class="hierarchy-section">
+            <h4>Intermediate Concepts</h4>
+            <ul>
+              <li>Application of foundation knowledge</li>
+              <li>Problem-solving techniques</li>
+              <li>Integration of multiple ideas</li>
+            </ul>
+          </div>
+          <div class="hierarchy-section">
+            <h4>Advanced Concepts</h4>
+            <ul>
+              <li>Complex problem solving</li>
+              <li>Theoretical extensions</li>
+              <li>Real-world applications</li>
+            </ul>
+          </div>
+        </div>
+      `)}
+    `;
+  })
+  .catch(error => {
+    console.error('Error fetching knowledge map:', error);
+    byId("knowledge-content").innerHTML = `
+      ${card("Knowledge Map", "Visual representation of your knowledge structure.", `
+        <div class="knowledge-map-container">
+          <p>Unable to load knowledge map. Please try again later.</p>
+        </div>
+      `)}
+      ${card("Concept Breakdown", "Deep dives into individual topics and their dependencies.", `
+        <ul>
+          <li>Mechanics and dynamics prerequisite for thermodynamics</li>
+          <li>Algebra foundation for calculus and physics</li>
+          <li>Cell biology essential for genetics and physiology</li>
+          <li>Bonding theory prerequisite for organic chemistry</li>
+        </ul>
+      `, "list-card")}
+    `;
+  });
+}
+
+function renderTutor(data) {
+  const starterPrompts = data.ai_tutoring?.starter_prompts || [
+    "Explain the Pythagorean theorem with a real-world example",
+    "Help me understand photosynthesis step by step",
+    "What are the main causes of World War I?",
+    "How do I solve quadratic equations?"
+  ];
+  const promptsHtml = starterPrompts.map((item) => `<li>${item}</li>`).join("");
+
+  byId("tutor-content").innerHTML = `
+    ${card("AI Support", "Your intelligent learning companion available 24/7.", `
+      <ul>
+        ${promptsHtml}
+      </ul>
+    `)}
+    ${card("Ask ClutchMate AI", "Use the prototype tutor endpoint for a fast structured explanation.", `
+      <div class="tutor">
+        <textarea id="tutorPrompt" placeholder="Ask a doubt, request a simplified explanation, or ask for practice questions."></textarea>
+        <button type="button" id="tutorButton">Generate explanation</button>
+        <div id="tutorOutput" class="tutor-output">Your AI help will appear here.</div>
+      </div>
+    `)}
+  `;
+
+  setTimeout(() => {
+    const tutorButton = byId("tutorButton");
+    if (tutorButton) {
+      tutorButton.addEventListener("click", async () => {
+        const prompt = byId("tutorPrompt").value.trim();
+        if (!prompt) {
+          byId("tutorOutput").textContent = "Enter a question first.";
+          return;
+        }
+
+        byId("tutorOutput").textContent = "Thinking through the concept...";
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/ai-tutor`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ prompt })
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || "Tutor request failed.");
+          }
+          const providerLabel = result.provider === "local" ? "Offline tutor mode" : "AI tutor";
+          byId("tutorOutput").textContent = `${result.answer}\n\n[${providerLabel}]`;
+        } catch (error) {
+          byId("tutorOutput").textContent = error.message || "The tutor could not answer right now.";
+        }
+      });
+    }
+  }, 0);
+}
+
+function escapeHtml(value) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderPaperAnalyzer(data) {
+  byId("paper-analyzer-content").innerHTML = `
+    ${card("Paper Analyzer", "Upload a test paper image and get a Google Lens-style mistake analysis.", `
+      <div class="upload-section" style="display:grid; gap:14px;">
+        <input id="paperFileInput" type="file" accept="image/*" />
+        <div style="display:grid; gap:10px;">
+          <label style="font-weight:700;">Optional syllabus upload</label>
+          <input id="syllabusFileInput" type="file" accept=".txt,.md,.pdf" />
+          <textarea id="syllabusTextInput" placeholder="Or paste your syllabus/topics here" style="width:100%; min-height:100px; padding:12px; border-radius:14px; border:1px solid rgba(23,32,51,0.12); resize:vertical;"></textarea>
+        </div>
+        <button type="button" id="analyzePaperBtn" class="button-primary" style="padding: 14px 18px; border:none; border-radius:14px; background:var(--accent-3); color:white; cursor:pointer; font-weight:700;">Analyze test paper</button>
+        <div id="paper-analysis-status" style="color: var(--muted); font-size: 14px;"></div>
+        <div id="paper-analysis-result" style="margin-top: 18px;"></div>
+      </div>
+    `)}
+  `;
+
+  const analyzeButton = byId("analyzePaperBtn");
+  if (analyzeButton) {
+    analyzeButton.addEventListener("click", async () => {
+      const fileInput = byId("paperFileInput");
+      const status = byId("paper-analysis-status");
+      const resultBox = byId("paper-analysis-result");
+      resultBox.innerHTML = '';
+
+      if (!fileInput.files || !fileInput.files.length) {
+        status.textContent = 'Please choose an image of a test paper first.';
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+      const syllabusFileInput = byId('syllabusFileInput');
+      const syllabusTextInput = byId('syllabusTextInput');
+      if (syllabusFileInput && syllabusFileInput.files && syllabusFileInput.files.length) {
+        formData.append('syllabus_file', syllabusFileInput.files[0]);
+      }
+      if (syllabusTextInput && syllabusTextInput.value.trim()) {
+        formData.append('syllabus_text', syllabusTextInput.value.trim());
+      }
+
+      status.textContent = 'Uploading and analyzing the paper...';
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/paper-analyzer/analyze`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || 'Paper analysis failed.');
+        }
+
+        if (data.vision_error) {
+          status.textContent = `Vision API issue: ${data.vision_error}`;
+        } else {
+          status.textContent = 'Analysis complete.';
+        }
+
+        resultBox.innerHTML = `
+          <div class="section-card" style="padding:18px;">
+            <h4>Extracted text</h4>
+            <pre style="white-space: pre-wrap; word-break: break-word; background: #f7f9ff; padding: 14px; border-radius: 14px; border: 1px solid rgba(23,32,51,0.08);">${escapeHtml(data.extracted_text || 'No text detected')}</pre>
+          </div>
+          ${data.syllabus_note ? `<div class="section-card" style="padding:18px; margin-top:18px;"><h4>Syllabus context</h4><p style="white-space: pre-wrap; line-height:1.65;">${escapeHtml(data.syllabus_note)}</p></div>` : ''}
+          <div class="section-card" style="padding:18px; margin-top:18px;">
+            <h4>Paper analysis</h4>
+            <p style="white-space: pre-wrap; line-height:1.65;">${escapeHtml(data.analysis || 'No analysis available.')}</p>
+          </div>
+        `;
+      } catch (error) {
+        status.textContent = `Error: ${error.message}`;
+      }
+    });
+  }
+}
+
+function renderWeakness(data) {
+  const repeatedPatterns = data.weakness_intelligence.repeated_patterns || [];
+  const highRiskTopics = data.weakness_intelligence.high_risk_topics || [];
+  const targetedPlan = data.weakness_intelligence.targeted_plan || [];
+  const paperInsights = data.weakness_intelligence.paper_analysis_insights || [];
+
+  byId("weakness-content").innerHTML = `
+    ${card("Weakness Intelligence", "Repeated mistake patterns, likely future errors, and high-risk areas.", `
+      <ul>
+        ${repeatedPatterns.length ? repeatedPatterns.map((item) => `<li>${item}</li>`).join("") : '<li>No repeated weakness patterns identified yet for your selected subjects.</li>'}
+      </ul>
+      <div class="chip-list" style="margin-top:14px;">
+        ${highRiskTopics.length ? highRiskTopics.map((item) => `<span class="chip">${item}</span>`).join("") : '<span class="chip">No high-risk topics available yet</span>'}
+      </div>
+    `, "list-card")}
+    ${paperInsights.length ? card("Paper Analysis Findings", "Recent mistake patterns identified from your uploaded test papers.", `
+      <ul>
+        ${paperInsights.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
+    `) : ''}
+    ${card("Targeted Improvement Plan", "Focused actions to convert weak areas into scoring gains.", `
+      <div class="task-list">
+        ${targetedPlan.length ? targetedPlan.map((item, index) => metricItem(`Plan ${index + 1}`, item)).join("") : metricItem('Next step', 'Review your current subjects and identify the weakest concept to practice first.')}
+      </div>
+    `)}
+  `;
+}
+
+function renderProductivity(data) {
+  const roiBars = data.productivity_roi.time_per_subject.map((item) => `
+    <div class="bar-row">
+      <div><strong>${item.subject}</strong> <span style="color:var(--muted);">${item.hours} hrs/week</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(item.hours * 10, 100)}%"></div></div>
+    </div>
+  `).join("");
+
+  byId("productivity-content").innerHTML = `
+    ${card("Productivity & ROI Analysis", "Compare effort, marks improvement, and time allocation by subject.", `<div class="bars">${roiBars}</div>`)}
+    ${card("Pomodoro Power-Up", "Set work and break cycles with reminders when it’s time to pause or return to focus.", `
+      <div style="display:grid; gap:12px;">
+        <div class="metric-list">
+          ${metricItem("Work interval", `${pomodoroSettings.workMinutes} min`)}
+          ${metricItem("Break interval", `${pomodoroSettings.breakMinutes} min`)}
+          ${metricItem("Current round", `${pomodoroSettings.currentRound} / ${pomodoroSettings.rounds}`)}
+        </div>
+        <div style="display:grid; gap:10px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <input id="pomodoroWork" type="number" min="10" max="60" value="${pomodoroSettings.workMinutes}" placeholder="Work (min)" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+            <input id="pomodoroBreak" type="number" min="3" max="30" value="${pomodoroSettings.breakMinutes}" placeholder="Break (min)" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+            <input id="pomodoroRounds" type="number" min="1" max="8" value="${pomodoroSettings.rounds}" placeholder="Rounds" style="flex:1; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <button type="button" onclick="startPomodoro()" style="flex:1; background:#10b981; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">Start Pomodoro</button>
+            <button type="button" onclick="stopPomodoro()" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">Stop</button>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <span>Timer:</span><strong id="pomodoroTimerDisplay">00:00</strong>
+            <span id="pomodoroModeLabel" style="color:var(--muted);">Idle</span>
+          </div>
+        </div>
+      </div>
+    `)}
+    ${card("Optimization Suggestions", "Find where time is paying off and where it is leaking.", `
+      <div class="metric-list">
+        ${metricItem("Best return", data.productivity_roi.best_return)}
+        ${metricItem("Inefficient area", data.productivity_roi.inefficient_area)}
+        ${metricItem("Optimization tip", data.productivity_roi.optimization_tip)}
+      </div>
+    `)}
+  `;
+}
+
+function updatePomodoroUI() {
+  const display = byId('pomodoroTimerDisplay');
+  const modeLabel = byId('pomodoroModeLabel');
+  if (display) display.textContent = formatTimer(pomodoroSeconds);
+  if (modeLabel) modeLabel.textContent = pomodoroState === 'work' ? 'Work' : pomodoroState === 'break' ? 'Break' : 'Idle';
+}
+
+function startPomodoro() {
+  const workInput = byId('pomodoroWork');
+  const breakInput = byId('pomodoroBreak');
+  const roundsInput = byId('pomodoroRounds');
+
+  pomodoroSettings.workMinutes = Math.max(10, Number(workInput.value) || 25);
+  pomodoroSettings.breakMinutes = Math.max(3, Number(breakInput.value) || 5);
+  pomodoroSettings.rounds = Math.max(1, Number(roundsInput.value) || 4);
+  pomodoroSettings.currentRound = 1;
+
+  pomodoroState = 'work';
+  pomodoroSeconds = pomodoroSettings.workMinutes * 60;
+  if (pomodoroTimer) clearInterval(pomodoroTimer);
+  pomodoroTimer = setInterval(() => {
+    pomodoroSeconds -= 1;
+    updatePomodoroUI();
+    if (pomodoroSeconds <= 0) {
+      if (pomodoroState === 'work') {
+        notifyUser('Time for a break', 'You completed a work block; take a short break.');
+        playNotificationSound();
+        pomodoroState = 'break';
+        pomodoroSeconds = pomodoroSettings.breakMinutes * 60;
+      } else {
+        pomodoroSettings.currentRound += 1;
+        if (pomodoroSettings.currentRound > pomodoroSettings.rounds) {
+          notifyUser('Pomodoro session complete', 'Nice work! You finished your Pomodoro cycle.');
+          playNotificationSound();
+          stopPomodoro();
+          return;
+        }
+        notifyUser('Back to focus', 'Start the next work block.');
+        playNotificationSound();
+        pomodoroState = 'work';
+        pomodoroSeconds = pomodoroSettings.workMinutes * 60;
+      }
+      updatePomodoroUI();
+    }
+  }, 1000);
+  updatePomodoroUI();
+}
+
+function stopPomodoro() {
+  if (pomodoroTimer) {
+    clearInterval(pomodoroTimer);
+    pomodoroTimer = null;
+  }
+  pomodoroState = 'idle';
+  pomodoroSeconds = 0;
+  pomodoroSettings.currentRound = 1;
+  updatePomodoroUI();
+}
+
+function renderAssignments(data) {
+  const assignmentsData = Array.isArray(data.assignments) ? data.assignments : [];
+  const assignments = assignmentsData.length ? assignmentsData.map((item) => `
+    <div class="assignment" style="position: relative; padding-right: 120px;">
+      <strong>${item.title || 'Untitled assignment'}</strong>
+      <span>${item.status || 'No status'}</span><br>
+      <span>Due: ${item.due || 'No deadline'} · Linked subject: ${item.linked_subject || 'General'}</span>
+      <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+        ${item.id ? `<button onclick="toggleAssignmentCompleted(${item.id}, ${item.completed ? 'false' : 'true'})" style="border:none; padding:8px 12px; border-radius:8px; background:${item.completed ? '#f59e0b' : '#10b981'}; color:white; cursor:pointer;">${item.completed ? 'Mark not done' : 'Mark done'}</button>` : ''}
+        ${item.id ? `<button onclick="editAssignment(${item.id})" style="border:none; padding:8px 12px; border-radius:8px; background:#3b82f6; color:white; cursor:pointer;">Edit</button>` : ''}
+        ${item.id ? `<button onclick="deleteAssignment(${item.id})" style="border:none; padding:8px 12px; border-radius:8px; background:#ef4444; color:white; cursor:pointer;">Delete</button>` : ''}
+      </div>
+    </div>
+  `).join("") : '<div class="overview-todo-item">No assignments yet. Add one to get started.</div>';
+
+  const strongTopicsText = Array.isArray(data.dashboard?.strong_topics) && data.dashboard.strong_topics.length ? data.dashboard.strong_topics.join(', ') : 'No strong topics yet';
+  const weakTopicsText = Array.isArray(data.dashboard?.weak_topics) && data.dashboard.weak_topics.length ? data.dashboard.weak_topics.join(', ') : 'No weak topics yet';
+
+  byId("assignments-content").innerHTML = `
+    ${card("Assignments & Deadlines", "Track tasks, deadlines, and plan integration.", `<div class="assignment-list">${assignments}</div>`)}
+    ${card("Add or Update Assignment", "Create new assignments, modify existing ones, and mark them complete.", `
+      <div style="display:grid; gap:12px;">
+        <input type="hidden" id="assignmentId" value="">
+        <input type="text" id="assignmentTitle" placeholder="Assignment title" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+        <input type="date" id="assignmentDeadline" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+        <input type="text" id="assignmentSubject" placeholder="Subject (e.g. Physics)" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+        <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+          <button type="button" id="saveAssignmentButton" style="background:linear-gradient(135deg, #2563eb, #38bdf8); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">Save Assignment</button>
+          <button type="button" id="cancelAssignmentEditButton" style="background:#64748b; color:white; border:none; padding:12px; border-radius:8px; cursor:pointer; display:none;">Cancel</button>
+        </div>
+      </div>
+    `)}
+    ${card("Dashboard Snapshot", "Strong topics, weak topics, and efficiency metrics.", `
+      <div class="metric-list">
+        ${metricItem("Strong topics", strongTopicsText)}
+        ${metricItem("Weak topics", weakTopicsText)}
+        ${metricItem("Completion rate", `${data.hero?.completion_rate || 0}%`)}
+      </div>
+    `)}
+  `;
+
+  setTimeout(() => {
+    const saveButton = byId('saveAssignmentButton');
+    const cancelButton = byId('cancelAssignmentEditButton');
+    if (saveButton) {
+      saveButton.addEventListener('click', saveAssignment);
+    }
+    if (cancelButton) {
+      cancelButton.addEventListener('click', resetAssignmentForm);
+    }
+  }, 0);
+}
+
+function resetAssignmentForm() {
+  byId('assignmentId').value = '';
+  byId('assignmentTitle').value = '';
+  byId('assignmentDeadline').value = '';
+  byId('assignmentSubject').value = '';
+  const saveButton = byId('saveAssignmentButton');
+  const cancelButton = byId('cancelAssignmentEditButton');
+  if (saveButton) saveButton.textContent = 'Save Assignment';
+  if (cancelButton) cancelButton.style.display = 'none';
+}
+
+async function saveAssignment() {
+  const assignmentId = byId('assignmentId').value;
+  const title = byId('assignmentTitle').value.trim();
+  const deadline = byId('assignmentDeadline').value;
+  const subject = byId('assignmentSubject').value.trim() || 'General';
+
+  if (!title || !deadline) {
+    alert('Please provide both a title and a deadline.');
+    return;
+  }
+
+  const payload = { title, deadline: `${deadline}T00:00:00`, subject };
+  const method = assignmentId ? 'PUT' : 'POST';
+  const url = assignmentId ? `${API_BASE_URL}/api/assignments/${assignmentId}` : `${API_BASE_URL}/api/assignments`;
+
+  try {
+    const response = await fetch(url, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to save assignment.');
+    }
+
+    resetAssignmentForm();
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Failed to save assignment.');
+  }
+}
+
+function editAssignment(assignmentId) {
+  if (!assignmentId) return;
+
+  const assignment = userData.assignments?.find((item) => item.id === assignmentId);
+  if (!assignment) {
+    alert('Assignment not found.');
+    return;
+  }
+
+  byId('assignmentId').value = assignmentId;
+  byId('assignmentTitle').value = assignment.title || '';
+  byId('assignmentDeadline').value = assignment.deadline ? assignment.deadline.slice(0, 10) : '';
+  byId('assignmentSubject').value = assignment.linked_subject || '';
+
+  const saveButton = byId('saveAssignmentButton');
+  const cancelButton = byId('cancelAssignmentEditButton');
+  if (saveButton) saveButton.textContent = 'Update Assignment';
+  if (cancelButton) cancelButton.style.display = 'inline-flex';
+}
+
+async function toggleAssignmentCompleted(assignmentId, completed) {
+  if (!assignmentId) return;
+
+  try {
+    const completedValue = parseBoolean(completed);
+    const response = await fetch(`${API_BASE_URL}/api/assignments/${assignmentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ completed: completedValue })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to update assignment status.');
+    }
+
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Failed to update assignment status.');
+  }
+}
+
+async function deleteAssignment(assignmentId) {
+  if (!assignmentId || !confirm('Delete this assignment?')) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/assignments/${assignmentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to delete assignment.');
+    }
+
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Failed to delete assignment.');
+  }
+}
+
+function renderStudyMaterials(data) {
+  const materials = data.study_materials || [];
+  const materialsList = materials.length ? materials.map((item) => `
+    <div class="task">
+      <strong>${item.title}</strong>
+      <span>${item.description || 'No description provided.'}</span><br>
+      <span>Subject: ${item.subject} · Type: ${item.type} · Added: ${item.date}</span>
+      <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+        ${item.file_url ? `<button onclick="window.open('${item.file_url}', '_blank')" style="border:none; padding:8px 12px; border-radius:8px; background:#2563eb; color:white; cursor:pointer;">Open</button>` : ''}
+        ${item.id ? `<button onclick="event.stopPropagation(); deleteMaterial(${item.id})" style="border:none; padding:8px 12px; border-radius:8px; background:#ef4444; color:white; cursor:pointer;">Delete</button>` : ''}
+      </div>
+    </div>
+  `).join("") : "<p>No study materials saved yet.</p>";
+
+  byId("study-materials-content").innerHTML = `
+    ${card("Study Materials Library", "Save and organize your notes, PDFs, videos, and other study resources.", `<div class="task-list">${materialsList}</div>`)}
+    ${card("Add New Material", "Keep all your study resources in one place for easy access.", `
+      <div style="display:grid; gap:12px;">
+        <input type="text" id="materialTitle" placeholder="Title (e.g., Physics Chapter 5 Notes)" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+        <textarea id="materialDesc" placeholder="Description or notes" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); min-height:80px; resize:vertical;"></textarea>
+        <select id="materialSubject" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+          <option value="">Select subject</option>
+          ${((data.performance_analysis?.subject_stats || []).map(s => `<option value="${s.name}">${s.name}</option>`).join(""))}
+          ${((data.subjects || []).filter(s => s).map(s => `<option value="${s}">${s}</option>`).join(""))}
+          <option value="General">General</option>
+        </select>
+        <select id="materialType" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12);">
+          <option value="notes">Notes</option>
+          <option value="pdf">PDF/Document</option>
+          <option value="video">Video</option>
+          <option value="link">Link</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="file" id="materialFile" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); background: var(--surface); color: var(--ink);" />
+        <button type="button" id="saveMaterialButton" style="background:linear-gradient(135deg, #2563eb, #38bdf8); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">Save Material</button>
+      </div>
+    `)}
+  `;
+
+  setTimeout(() => {
+    const saveButton = byId('saveMaterialButton');
+    if (saveButton) {
+      saveButton.addEventListener('click', addMaterial);
+    }
+  }, 0);
+}
+
+async function renderCommunity(data = {}) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/community/posts`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    });
+    const posts = response.ok ? await response.json() : [];
+
+    const communityPosts = posts.length ? posts.map((post) => `
+      <div class="task" style="padding: 18px;">
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <div>
+            <strong style="font-size:16px;">${post.title}</strong>
+            <p style="margin:8px 0; color: var(--muted);">${post.subject} · by ${post.author_name} · ${new Date(post.created_at).toLocaleString()}</p>
+          </div>
+          <button type="button" onclick="likeCommunityPost(${post.id})" style="background:#f97316; color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer;">❤️ ${post.likes || 0}</button>
+        </div>
+        <p style="margin:10px 0; line-height:1.6;">${post.content}</p>
+        <div style="display:grid; gap:12px; margin-top:12px;">
+          ${post.comments.map((comment) => `
+            <div style="background:rgba(255,255,255,0.06); padding:12px; border-radius:12px;">
+              <strong>${comment.author_name}</strong> <span style="color:var(--muted);">• ${new Date(comment.created_at).toLocaleString()}</span>
+              <p style="margin:8px 0 0 0;">${comment.content}</p>
+            </div>
+          `).join('')}
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <input id="commentInput-${post.id}" placeholder="Reply to this post" style="flex:1; min-width:220px; padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); background:#0f172a; color:white;" />
+            <button type="button" onclick="submitCommunityComment(${post.id})" style="background:#2563eb; color:white; border:none; padding:10px 14px; border-radius:8px; cursor:pointer;">Comment</button>
+          </div>
+        </div>
+      </div>
+    `).join('') : '<p>No posts yet. Start the conversation with your first study win or question.</p>';
+
+    byId('community-content').innerHTML = `
+      ${card('Community Feed', 'Connect with other students, ask for help, and share study wins.', `
+        <div style="display:grid; gap:12px;">
+          <input id="communityTitle" placeholder="Post title" style="padding:12px; border-radius:10px; border:1px solid rgba(23,32,51,0.12); width:100%;">
+          <textarea id="communityContent" placeholder="What do you want to share or ask?" style="padding:12px; border-radius:10px; border:1px solid rgba(23,32,51,0.12); min-height:100px; resize:vertical; width:100%;"></textarea>
+          <select id="communitySubject" style="padding:12px; border-radius:10px; border:1px solid rgba(23,32,51,0.12); width:100%;">
+            <option value="General">General</option>
+            ${(data.subjects || []).filter(Boolean).map((subject) => `<option value="${subject}">${subject}</option>`).join('')}
+          </select>
+          <button type="button" onclick="submitCommunityPost()" style="background:linear-gradient(135deg, #10b981, #3b82f6); color:white; border:none; padding:14px; border-radius:10px; cursor:pointer;">Share with the community</button>
+        </div>
+      `)}
+      ${card('Latest Posts', 'See what other students are talking about and join the conversation.', `<div class="task-list">${communityPosts}</div>`) }
+    `;
+  } catch (error) {
+    console.error('Community load error:', error);
+    byId('community-content').innerHTML = `
+      ${card('Community Feed', 'Unable to load community posts right now.', '<p>Please refresh the dashboard or try again later.</p>')}
+    `;
+  }
+}
+
+async function submitCommunityPost() {
+  const title = byId('communityTitle').value.trim();
+  const content = byId('communityContent').value.trim();
+  const subject = byId('communitySubject').value;
+
+  if (!title || !content) {
+    alert('Please enter a title and a message before posting.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/community/posts`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title, content, subject })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to share post.');
+    }
+
+    byId('communityTitle').value = '';
+    byId('communityContent').value = '';
+    renderCommunity();
+  } catch (error) {
+    alert(error.message || 'Unable to create community post.');
+  }
+}
+
+async function submitCommunityComment(postId) {
+  const input = byId(`commentInput-${postId}`);
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content) {
+    alert('Please enter a comment before posting.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/community/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ content })
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to post comment.');
+    }
+
+    renderCommunity();
+  } catch (error) {
+    alert(error.message || 'Unable to add comment.');
+  }
+}
+
+async function likeCommunityPost(postId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/community/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to like the post.');
+    }
+
+    renderCommunity();
+  } catch (error) {
+    alert(error.message || 'Unable to like post.');
+  }
+}
+
+function renderCommunityPostCard(post) {
+  const commentCount = (post.comments || []).length;
+  const authorName = post.author_name || 'Student';
+  const initials = authorName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('') || 'ST';
+
+  return `
+    <article class="community-post">
+      <div class="community-post-meta">
+        <div class="community-avatar">${initials}</div>
+        <div class="community-author">
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <strong>${authorName}</strong>
+            <span class="community-subject-chip">${post.subject || 'General'}</span>
+          </div>
+          <div class="community-author-line">
+            <span>Student community member</span>
+            <span>•</span>
+            <span>${new Date(post.created_at).toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h4 class="community-post-title">${post.title}</h4>
+        <p class="community-post-body">${post.content}</p>
+      </div>
+      <div class="community-post-actions">
+        <div class="community-action-bar">
+          <button type="button" class="community-action like" onclick="likeCommunityPost(${post.id})">Like · ${post.likes || 0}</button>
+          <button type="button" class="community-action" onclick="byId('commentInput-${post.id}')?.focus()">Reply · ${commentCount}</button>
+        </div>
+        <div class="community-stats">${commentCount} ${commentCount === 1 ? 'reply' : 'replies'}</div>
+      </div>
+      <div class="community-comments">
+        ${(post.comments || []).map((comment) => {
+          const commentAuthor = comment.author_name || 'Student';
+          const commentInitial = commentAuthor.trim()[0] ? commentAuthor.trim()[0].toUpperCase() : 'S';
+          return `
+            <div class="community-comment">
+              <div class="community-avatar" style="width:38px; height:38px; font-size:13px;">${commentInitial}</div>
+              <div class="community-comment-body">
+                <strong>${commentAuthor}</strong>
+                <div class="community-author-line">
+                  <span>${new Date(comment.created_at).toLocaleString()}</span>
+                </div>
+                <p>${comment.content}</p>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        <div class="comment-composer">
+          <input id="commentInput-${post.id}" placeholder="Add a thoughtful reply..." />
+          <button type="button" onclick="submitCommunityComment(${post.id})">Reply</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function toggleCommunityPanel(panelId) {
+  const panels = ['communityCreatePanel', 'communityInsightsPanel'];
+  panels.forEach((id) => {
+    const panel = byId(id);
+    if (!panel) return;
+    panel.classList.toggle('open', id === panelId ? !panel.classList.contains('open') : false);
+  });
+}
+
+async function renderCommunity(data = {}) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/community/posts`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+    });
+    const posts = response.ok ? await response.json() : [];
+    const totalComments = posts.reduce((sum, post) => sum + ((post.comments || []).length), 0);
+    const topSubjects = [...new Set(posts.map((post) => post.subject).filter(Boolean))].slice(0, 4);
+
+    const communityPosts = posts.length
+      ? posts.map((post) => renderCommunityPostCard(post)).join('')
+      : `
+        <div class="community-empty">
+          <strong style="display:block; margin-bottom:8px;">No posts yet</strong>
+          <span style="color:var(--muted);">Start with a study win, a question, or a resource recommendation.</span>
+        </div>
+      `;
+
+    byId('community-content').innerHTML = `
+      <div class="community-layout">
+        <div class="community-toolbar">
+          <div>
+            <h3 style="margin:0 0 6px 0;">Community Feed</h3>
+            <p style="margin:0; color:var(--muted);">The main feed now stays front and center while tools open only when you need them.</p>
+          </div>
+          <div class="community-toolbar-actions">
+            <button type="button" class="community-toggle" onclick="toggleCommunityPanel('communityCreatePanel')">Create post</button>
+            <button type="button" class="community-toggle" onclick="toggleCommunityPanel('communityInsightsPanel')">Insights</button>
+          </div>
+        </div>
+        <div id="communityCreatePanel" class="community-panel">
+          ${card('Start a Post', 'Write a quick update, ask a question, or share a resource with the group.', `
+            <div class="community-composer">
+              <input id="communityTitle" placeholder="Headline for your post" />
+              <textarea id="communityContent" placeholder="Share a study insight, ask for help, or post something useful for others..."></textarea>
+              <div class="community-composer-row">
+                <select id="communitySubject" style="max-width: 180px;">
+                  <option value="General">General</option>
+                  ${(data.subjects || []).filter(Boolean).map((subject) => `<option value="${subject}">${subject}</option>`).join('')}
+                </select>
+                <button type="button" class="community-submit" onclick="submitCommunityPost()">Post to feed</button>
+              </div>
+            </div>
+          `)}
+        </div>
+        <div id="communityInsightsPanel" class="community-panel">
+          ${card('Community Snapshot', 'A quick pulse check so the page feels more like a live network.', `
+            <div class="metric-list">
+              ${metricItem('Active posts', `${posts.length} in the feed`)}
+              ${metricItem('Replies shared', `${totalComments} total comments`)}
+              ${metricItem('Subjects trending', topSubjects.length ? topSubjects.join(', ') : 'General discussion')}
+            </div>
+          `)}
+        </div>
+        <div class="community-feed">
+          ${card('Community Feed', 'A conversation-first feed inspired by study forums and professional networks.', communityPosts)}
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error('Community load error:', error);
+    byId('community-content').innerHTML = `
+      ${card('Community Feed', 'Unable to load community posts right now.', '<p>Please refresh the dashboard or try again later.</p>')}
+    `;
+  }
+}
+
+async function addMaterial() {
+  const title = byId("materialTitle").value.trim();
+  const desc = byId("materialDesc").value.trim();
+  const subject = byId("materialSubject").value;
+  const type = byId("materialType").value;
+  const fileInput = byId("materialFile");
+  const file = fileInput?.files?.[0];
+
+  if (!title || !subject) {
+    alert("Please fill in title and subject");
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', desc);
+    formData.append('subject', subject);
+    formData.append('type', type);
+    if (file) {
+      formData.append('file', file);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/study-materials`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      },
+      body: formData
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || 'Unable to save study material.');
+    }
+
+    byId("materialTitle").value = "";
+    byId("materialDesc").value = "";
+    byId("materialSubject").value = "";
+    byId("materialType").value = "notes";
+    if (fileInput) fileInput.value = '';
+
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Failed to save material.');
+  }
+}
+
+async function deleteMaterial(materialId) {
+  if (!materialId) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/study-materials/${materialId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.error || 'Unable to delete study material.');
+    }
+
+    loadDashboard();
+  } catch (error) {
+    alert(error.message || 'Failed to delete material.');
+  }
+}
+
+function renderGamification(data) {
+  const heroData = data.hero || {};
+  const gamifyData = data.gamification || { badges: [], next_reward: 'No data yet' };
+  const multiUserData = data.multi_user || {
+    student_panel: 'Student panel not configured',
+    teacher_panel: 'Teacher panel not configured',
+    parent_panel: 'Parent panel not configured'
+  };
+
+  byId("gamification-content").innerHTML = `
+    ${card("Gamification", "XP, streaks, levels, and achievement momentum.", `
+      <div class="metric-list">
+        ${metricItem("XP", heroData.xp || 0)}
+        ${metricItem("Level", heroData.level || 0)}
+        ${metricItem("Streak", `${heroData.streak || 0} days`)}
+      </div>
+    `)}
+    ${card("Achievement Badges", "Celebrate consistency and progress.", `
+      <div class="chip-list">
+        ${gamifyData.badges.map((item) => `<span class="chip">${item}</span>`).join("")}
+        ${gamifyData.badges.length === 0 ? '<p>No badges earned yet.</p>' : ''}
+      </div>
+      <p style="margin-top:16px;color:var(--muted);">${gamifyData.next_reward}</p>
+    `)}
+    ${card("Multi-User System", "Student, teacher, and parent visibility in one prototype.", `
+      <div class="metric-list">
+        ${metricItem("Student panel", multiUserData.student_panel)}
+        ${metricItem("Teacher panel", multiUserData.teacher_panel)}
+        ${metricItem("Parent panel", multiUserData.parent_panel)}
+      </div>
+    `)}
+  `;
+}
+
+function renderAlerts(data) {
+  const smartAlerts = data.smart_alerts || { alerts: [] };
+  const integrationsData = data.integrations || { available: [], future: [] };
+
+  const alarmsHtml = alarmEntries.length ? alarmEntries.map((alarm, index) => `
+      <div class="task" style="padding:14px;">
+        <strong>${alarm.label}</strong>
+        <span>${new Date(alarm.time).toLocaleString()}</span>
+        <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" onclick="removeAlarm(${index})" style="border:none; padding:8px 12px; border-radius:8px; background:#ef4444; color:white; cursor:pointer;">Delete</button>
+        </div>
+      </div>
+    `).join('') : '<p>No study alarms set yet.</p>';
+
+  byId("alerts-content").innerHTML = `
+    ${card("Smart Alerts", "Revision reminders, forgetting alerts, deadlines, and nudges.", `
+      <div class="alert-list">
+        ${(smartAlerts.alerts || []).length > 0 ? smartAlerts.alerts.map((item) => `<div class="alert"><span>${item}</span></div>`).join("") : '<p>No alerts at this moment.</p>'}
+      </div>
+    `)}
+    ${card("Study Alarms", "Schedule alarms for when it’s time to study, with desktop reminders.", `
+      <div style="display:grid; gap:12px;">
+        <input id="alarmLabel" placeholder="Alarm label" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); width:100%;">
+        <input id="alarmTime" type="datetime-local" style="padding:10px; border-radius:8px; border:1px solid rgba(23,32,51,0.12); width:100%;">
+        <button type="button" onclick="addAlarm()" style="width:100%; background:linear-gradient(135deg, #2563eb, #38bdf8); color:white; border:none; padding:12px; border-radius:8px; cursor:pointer;">Schedule alarm</button>
+        <div class="task-list">${alarmsHtml}</div>
+      </div>
+    `)}
+    ${card("Integrations", "External systems available now and planned next.", `
+      <div class="chip-list">
+        ${(integrationsData.available || []).map((item) => `<span class="chip">${item}</span>`).join("")}
+        ${(integrationsData.available || []).length === 0 ? '<p>No integrations configured.</p>' : ''}
+      </div>
+      <p style="margin-top:14px;color:var(--muted);">Future: ${(integrationsData.future || []).join(", ") || 'No integrations planned yet.'}</p>
+    `)}
+  `;
+}
+
+function addAlarm() {
+  const label = byId('alarmLabel')?.value.trim();
+  const timeValue = byId('alarmTime')?.value;
+  if (!label || !timeValue) {
+    alert('Add both a label and a future time for the alarm.');
+    return;
+  }
+  const alarmTime = new Date(timeValue);
+  if (alarmTime <= new Date()) {
+    alert('Please select a time in the future.');
+    return;
+  }
+  alarmEntries.push({ label, time: alarmTime.toISOString() });
+  saveStoredAlarms();
+  scheduleAlarmEntry({ label, time: alarmTime.toISOString() });
+  loadDashboard();
+}
+
+function removeAlarm(index) {
+  alarmEntries.splice(index, 1);
+  saveStoredAlarms();
+  scheduleAllAlarms();
+  loadDashboard();
+}
+
+function renderAdaptive(data) {
+  const adaptiveData = data.adaptive_testing || { quiz_focus: 'None', difficulty: 'Normal', feedback_mode: 'Standard' };
+  const advancedIntelligenceData = data.advanced_intelligence || { exam_prediction: 0, learning_style: 'Unknown', long_term_strategy: 'Baseline planning' };
+
+  byId("adaptive-content").innerHTML = `
+    ${card("Adaptive Testing", "Weak-area quiz generation, difficulty adjustment, and real-time feedback.", `
+      <div class="metric-list">
+        ${metricItem("Quiz focus", adaptiveData.quiz_focus)}
+        ${metricItem("Difficulty", adaptiveData.difficulty)}
+        ${metricItem("Feedback", adaptiveData.feedback_mode)}
+      </div>
+    `)}
+    ${card("Advanced Intelligence", "Exam prediction, learning style detection, and long-term AI strategy.", `
+      <div class="metric-list">
+        ${metricItem("Predicted exam score", `${advancedIntelligenceData.exam_prediction}%`)}
+        ${metricItem("Learning style", advancedIntelligenceData.learning_style)}
+        ${metricItem("Strategy", advancedIntelligenceData.long_term_strategy)}
+      </div>
+    `)}
+  `;
+}
+
+function renderWellness(data) {
+  const mentalHealth = data.mental_health || {};
+  const todayMood = mentalHealth.today_mood;
+  const stateLabel = mentalHealth.state_label || 'Balanced';
+  const recommendation = mentalHealth.recommendation || 'Keep checking in daily.';
+  const coachMessage = mentalHealth.coach_message || 'I’m here to keep your study energy steady.';
+  const quickTools = mentalHealth.quick_tools || [];
+  const reflectionNeeded = mentalHealth.reflection_needed;
+  const moodSummary = mentalHealth.mood_counts || { good: 0, okay: 0, stressed: 0, overwhelmed: 0 };
+  const moodHistory = mentalHealth.recent_mood_history || [];
+
+  byId("wellness-content").innerHTML = `
+    ${card("Daily Mood Check", "How are you feeling today? It takes 2 seconds and helps your plan adapt.", `
+      <div style="display:grid; gap: 12px;">
+        ${todayMood ? `<p style="margin:0 0 10px 0;">Today's mood: <strong>${todayMood.charAt(0).toUpperCase() + todayMood.slice(1)}</strong></p>` : `
+          <div class="button-grid" style="grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
+            <button class="wellness-button good" onclick="submitMood('good')">😄 Good</button>
+            <button class="wellness-button okay" onclick="submitMood('okay')">😐 Okay</button>
+            <button class="wellness-button stressed" onclick="submitMood('stressed')">😞 Stressed</button>
+            <button class="wellness-button overwhelmed" onclick="submitMood('overwhelmed')">😵 Overwhelmed</button>
+          </div>
+        `}
+        <p style="color:var(--muted); margin:0;">This mood check links to your performance, missed tasks, and recovery signals.</p>
+      </div>
+    `)}
+    ${card("Mental State", "Your current study energy, risk signals, and what to do next.", `
+      <div class="metric-list">
+        ${metricItem("State", stateLabel)}
+        ${metricItem("Consistency", `${mentalHealth.consistency_score || 0}%`)}
+        ${metricItem("Missed tasks", mentalHealth.missed_tasks || 0)}
+        ${metricItem("Completion", `${mentalHealth.completion_rate || 0}%`)}
+      </div>
+      <p style="margin-top:12px; color:var(--muted);">${recommendation}</p>
+    `)}
+    ${card("Coach Response", "A calm coach voice that guides your next move.", `
+      <p style="line-height:1.7; margin:0;">${coachMessage}</p>
+    `)}
+    ${card("Meditation Timer", "Start a calming reset with a pulsing timer background.", `
+      <div class="meditation-card">
+        <div id="meditationPulse" class="pulse-ring ${meditationActive ? 'active' : ''}">
+          <div id="meditationTimeDisplay" class="timer-display">${formatTimer(meditationRemaining || 120)}</div>
+        </div>
+        <div class="meditation-button-grid">
+          <button id="meditationButton" class="button-primary" type="button" onclick="toggleMeditation()">${meditationActive ? 'Pause reset' : 'Start 2-min reset'}</button>
+          <button class="button-secondary" type="button" onclick="startMeditationTimer(600)">10-min calm</button>
+        </div>
+        <p style="margin:0; color:var(--muted);">A short breathing timer built to keep reset simple and fast.</p>
+      </div>
+    `)}
+    ${card("Quick reset tools", "One click for breathing, focus, or emergency calm.", `
+      <div class="button-grid" style="grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px;">
+        ${quickTools.map((tool) => `<button class="wellness-button" onclick="triggerWellnessTool('${tool.name.replace(/'/g, "\\'")}')">${tool.name}</button>`).join('')}
+      </div>
+      <p id="wellness-tool-feedback" style="margin-top:12px; color:var(--muted);">Use these when you need a fast reset.</p>
+    `)}
+    ${reflectionNeeded ? card("Weekly Reflection", "Answer this once a week to make your mental model smarter.", `
+      <p style="margin:0 0 10px 0;">${mentalHealth.weekly_reflection_prompt || 'What stressed you most? What went well?'}</p>
+      <textarea id="reflectionStressors" placeholder="What stressed you most?" style="width:100%; min-height:80px; padding:12px; border-radius:14px; border:1px solid rgba(23,32,51,0.12); resize:vertical;"></textarea>
+      <textarea id="reflectionWins" placeholder="What went well?" style="width:100%; min-height:80px; margin-top:10px; padding:12px; border-radius:14px; border:1px solid rgba(23,32,51,0.12); resize:vertical;"></textarea>
+      <button type="button" class="button-primary" onclick="submitReflection()" style="margin-top:12px;">Save reflection</button>
+    `) : ''}
+    ${card("Mood History", "Track recent check-ins and see how your mood is trending.", `
+      <div class="mood-grid">
+        ${Object.entries(moodSummary).map(([key, count]) => `<div class="mood-pill"><strong>${key.charAt(0).toUpperCase() + key.slice(1)}</strong><div style="margin-top:6px; color: var(--muted);">${count}</div></div>`).join('')}
+      </div>
+      ${moodHistory.length ? `<ul style="margin: 0; padding-left: 18px; color: var(--muted);">${moodHistory.map((item) => `<li>${new Date(item.created_at).toLocaleDateString()} — ${item.mood.charAt(0).toUpperCase()+item.mood.slice(1)}${item.sleep_hours ? ` · Sleep ${item.sleep_hours}h` : ''}${item.note ? ` · ${item.note}` : ''}</li>`).join('')}</ul>` : '<p style="margin:0; color: var(--muted);">Create a few mood entries so the system can learn your pattern.</p>'}
+    `)}
+  `;
+}
+
+function submitMood(mood) {
+  const payload = { mood };
+  fetch(`${API_BASE_URL}/api/wellness/mood`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
+      loadDashboard();
+    })
+    .catch((error) => {
+      alert(error.message || 'Unable to save your mood.');
+    });
+}
+
+function submitReflection() {
+  const stressors = byId('reflectionStressors')?.value.trim();
+  const wins = byId('reflectionWins')?.value.trim();
+  fetch(`${API_BASE_URL}/api/wellness/reflection`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ stressors, wins })
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.error) {
+        alert(result.error);
+        return;
+      }
+      alert('Reflection saved. Great work on checking in.');
+      loadDashboard();
+    })
+    .catch((error) => {
+      alert(error.message || 'Unable to save reflection.');
+    });
+}
+
+function triggerWellnessTool(name) {
+  const feedback = byId('wellness-tool-feedback');
+  if (!feedback) return;
+
+  if (name === '2-min reset') {
+    startMeditationTimer(120);
+    feedback.textContent = 'Starting a 2-minute reset. Breathe slowly and stay present.';
+    return;
+  }
+
+  if (name === 'Focus mode') {
+    startMeditationTimer(900);
+    feedback.textContent = 'Focus mode is on. Use the next 15 minutes for one clear study task.';
+    return;
+  }
+
+  if (name === 'Emergency calm') {
+    startMeditationTimer(180);
+    feedback.textContent = 'Emergency calm started. Use this short reset to bring your energy back down.';
+    return;
+  }
+
+  feedback.textContent = 'Use this tool to reset your focus and calm your study pace.';
+}
+
+function renderProfile(data) {
+  // Get current profile data
+  const profileData = {
+    name: data.name || '',
+    username: data.hero?.name || '',
+    email: '', // Will be fetched from API
+    grade_class: data.grade_class || '',
+    subjects: data.subjects || [],
+    goals: data.goals || {},
+    current_grades: data.grades || {}
+  };
+
+  byId("profile-content").innerHTML = `
+    ${card("Personal Information", "Update your basic information and username.", `
+      <div style="display: grid; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Full Name:</label>
+          <input type="text" id="profileName" value="${profileData.name}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Username:</label>
+          <input type="text" id="profileUsername" value="${profileData.username}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Grade/Class:</label>
+          <input type="text" id="profileGrade" value="${profileData.grade_class}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+      </div>
+    `)}
+    ${card("Academic Information", "Update your subjects and current grades.", `
+      <div style="display: grid; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Subjects (comma-separated):</label>
+          <input type="text" id="profileSubjects" value="${profileData.subjects.join(', ')}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Current Grades (JSON format):</label>
+          <textarea id="profileGrades" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; min-height: 80px; resize: vertical;">${JSON.stringify(profileData.current_grades, null, 2)}</textarea>
+        </div>
+      </div>
+    `)}
+    ${card("Goals & Exam", "Update your academic goals and exam date.", `
+      <div style="display: grid; gap: 15px;">
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Exam Date:</label>
+          <input type="date" id="profileExamDate" value="${profileData.goals.examDate || ''}" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Target Grade:</label>
+          <input type="number" id="profileTargetGrade" value="${profileData.goals.targetGrade || 85}" min="0" max="100" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+        <div>
+          <label style="display: block; margin-bottom: 5px; font-weight: bold;">Daily Study Hours:</label>
+          <input type="number" id="profileStudyHours" value="${profileData.goals.dailyStudyHours || 3}" min="1" max="12" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+        </div>
+      </div>
+    `)}
+    ${card("Actions", "Save your changes or reset to defaults.", `
+      <div style="display: flex; gap: 10px;">
+        <button onclick="saveProfile()" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #2a9d8f, #22c55e); color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
+        <button onclick="loadProfile()" style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Data</button>
+      </div>
+      <p style="margin-top: 10px; color: #666; font-size: 14px;">Changes will take effect immediately and may affect your personalized recommendations.</p>
+    `)}
+  `;
+
+  // Note: Initial values are set from dashboard data above
+  // User can click "Refresh Data" button to load latest from API
+}
+
+async function loadProfile() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/profile`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    
+    if (response.ok) {
+      const profileData = await response.json();
+      
+      // Update form fields with real data
+      byId('profileName').value = profileData.name || '';
+      byId('profileUsername').value = profileData.username || '';
+      byId('profileGrade').value = profileData.grade_class || '';
+      byId('profileSubjects').value = (profileData.subjects || []).join(', ');
+      byId('profileGrades').value = JSON.stringify(profileData.grades || {}, null, 2);
+      
+      if (profileData.goals) {
+        byId('profileExamDate').value = profileData.goals.examDate || '';
+        byId('profileTargetGrade').value = profileData.goals.targetGrade || 85;
+        byId('profileStudyHours').value = profileData.goals.dailyStudyHours || 3;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+  }
+}
+
+async function saveProfile() {
+  const profileData = {
+    username: byId('profileUsername').value.trim(),
+    gradeClass: byId('profileGrade').value.trim(),
+    subjects: byId('profileSubjects').value.split(',').map(s => s.trim()).filter(s => s),
+    grades: JSON.parse(byId('profileGrades').value || '{}'),
+    goals: {
+      examDate: byId('profileExamDate').value,
+      targetGrade: parseInt(byId('profileTargetGrade').value) || 85,
+      dailyStudyHours: parseInt(byId('profileStudyHours').value) || 3
+    }
+  };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/profile/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+    
+    const result = await response.json();
+    if (response.ok) {
+      alert('Profile updated successfully!');
+      // Reload dashboard to reflect changes
+      loadDashboard();
+    } else {
+      alert('Error updating profile: ' + result.error);
+    }
+  } catch (error) {
+    console.error('Error saving profile:', error);
+    alert('Failed to save profile. Please try again.');
+  }
+}
+
+function renderSystem(data) {
+  const efficiencyMetrics = data.dashboard?.efficiency_metrics || [
+    { label: "Physics efficiency", value: 0.92 },
+    { label: "Chemistry efficiency", value: 0.73 },
+    { label: "Math efficiency", value: 0.91 }
+  ];
+  
+  const revisionSchedule = data.study_planning?.revision_schedule || [
+    "Thermodynamics - Mar 26", 
+    "Organic reactions - Mar 27", 
+    "Parametric equations - Mar 28", 
+    "Enzyme kinetics - Mar 29"
+  ];
+  
+  const priorityTopics = data.study_planning?.priority_topics || [
+    "Thermodynamics", 
+    "Organic Chemistry", 
+    "Calculus", 
+    "Genetics", 
+    "Quantum Numbers"
+  ];
+  
+  byId("system-content").innerHTML = `
+    ${card("Efficiency Metrics", "Study efficiency by subject.", `
+      <div class="metric-list">
+        ${efficiencyMetrics.map((item) => metricItem(item.label, `${item.value} efficiency score`)).join("")}
+      </div>
+    `)}
+    ${card("Revision Schedule", "Upcoming spaced revision checkpoints.", `
+      <ul>
+        ${revisionSchedule.map((item) => `<li>${item}</li>`).join("")}
+      </ul>
+    `, "list-card")}
+    ${card("Priority Topics", "Highest-urgency areas for score improvement.", `
+      <div class="chip-list">
+        ${priorityTopics.map((item) => `<span class="chip">${item}</span>`).join("")}
+      </div>
+    `)}
+  `;
+}
+
+function hideLoading() {
+  if (!loading) return;
+  loading.classList.add('hidden');
+  setTimeout(() => {
+    loading.style.display = 'none';
+  }, 320);
+}
+
+async function loadDashboard() {
+  try {
+    console.log('Dashboard loading... Token present:', !!token);
+    
+    // If no real token, redirect to login
+    if (token === "demo_token") {
+      console.log('No valid token found, redirecting to login');
+      window.location.href = '/login';
+      return;
+    }
+
+    console.log('Fetching dashboard data...');
+    const response = await fetch(`${API_BASE_URL}/api/dashboard`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    console.log('Dashboard response status:', response.status);
+    
+    let data;
+    if (response.ok) {
+      data = await response.json();
+      console.log('Dashboard data received:', data);
+    } else {
+      console.error('Dashboard API error:', response.status, response.statusText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    // Check if user has completed personalization
+    const hasGoals = data.goals && (typeof data.goals === 'object' ? Object.keys(data.goals).length > 0 : data.goals.length > 0);
+    const hasSubjects = data.subjects && data.subjects.length > 0;
+    
+    console.log('Personalization check - Has goals:', hasGoals, 'Has subjects:', hasSubjects);
+    
+    if (!hasGoals || !hasSubjects) {
+      // User hasn't completed personalization yet, show setup message
+      console.log('Showing personalization setup message...');
+      document.body.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+          <div style="text-align: center; background: var(--surface-strong); color: var(--ink); padding: 40px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); max-width: 500px;">
+            <h1 style="color: var(--ink); margin-bottom: 20px;">Welcome to ClutchMate! 🎓</h1>
+            <p style="color: var(--muted); margin-bottom: 30px; line-height: 1.6;">To get started, we need to know a bit about your study goals and subjects. This will help us create a personalized learning experience just for you.</p>
+            <a href="/personalize" style="display: inline-block; background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: bold; transition: transform 0.2s;">Complete Setup</a>
+            <p style="color: #999; margin-top: 20px; font-size: 14px;">This will only take a few minutes!</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    console.log('Rendering dashboard...');
+    try {
+      if (!Array.isArray(data.assignments)) {
+        data.assignments = await fetchAssignmentsFromApi();
+      }
+      if (!data.dashboard) {
+        data.dashboard = { strong_topics: [], weak_topics: [], efficiency_metrics: [] };
+      }
+      data.dashboard.strong_topics = Array.isArray(data.dashboard.strong_topics) ? data.dashboard.strong_topics : [];
+      data.dashboard.weak_topics = Array.isArray(data.dashboard.weak_topics) ? data.dashboard.weak_topics : [];
+
+      // Store user data globally for use in other functions
+      userData = data;
+      userSubjects = data.subjects || [];
+      
+      // Store today's study time from backend
+      todayStudyMinutes = data.hero?.today_study_time || 0;
+      
+      renderHero(data);
+      renderOverviewTodoList(data);
+      renderPlanning(data);
+      renderPerformance(data);
+      renderKnowledge(data);
+      renderTutor(data);
+      renderPaperAnalyzer(data);
+      renderWeakness(data);
+      renderProductivity(data);
+      renderAssignments(data);
+      renderStudyMaterials(data);
+      renderCommunity(data);
+      renderGamification(data);
+      renderAlerts(data);
+      renderAdaptive(data);
+    } catch (error) {
+      console.error('Error rendering dashboard:', error);
+      // Show a fallback message
+      document.body.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
+          <div style="text-align: center;">
+            <h1>Dashboard Loading Error</h1>
+            <p>There was an issue loading your dashboard. Please try refreshing the page.</p>
+            <button onclick="window.location.reload()" style="padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">Refresh Page</button>
+          </div>
+        </div>
+      `;
+    }
+    renderWellness(data);
+    renderSystem(data);
+    renderProfile(data);
+    renderSummary(data);
+    applyPageMotion("overview");
+    hideLoading();
+    console.log('Dashboard loaded successfully');
+  } catch (error) {
+    console.error('Dashboard load error:', error);
+    console.error('Error stack:', error.stack);
+    const loading = document.getElementById("loading");
+
+    if (error.message && (error.message.includes('401') || error.message.toLowerCase().includes('token') || error.message.toLowerCase().includes('unauthorized'))) {
+      if (loading) {
+        loading.innerHTML = "🔒 Authentication required. Redirecting to login...";
+      }
+      setTimeout(() => {
+        localStorage.removeItem('clutchmate_token');
+        window.location.href = '/login';
+      }, 1200);
+      return;
+    }
+
+    if (loading) {
+      loading.innerHTML = `
+        <div style="text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+          <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Dashboard Loading Error</div>
+          <div style="color: #666; margin-bottom: 20px;">${error.message || 'There was an issue loading your dashboard.'}</div>
+          <button onclick="window.location.reload()" style="background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 10px;">Try Again</button>
+          <button onclick="localStorage.removeItem('clutchmate_token'); window.location.href='/login';" style="background: #6b7280; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Login Again</button>
+        </div>
+      `;
+      setTimeout(() => {
+        loading.innerHTML = "Loading your personalized ClutchMate dashboard...";
+      }, 10000);
+    }
+  }
+}
+
+const themeToggle = document.getElementById("themeToggle");
+
+function updateThemeButton(theme) {
+  if (!themeToggle) return;
+  themeToggle.textContent = theme === 'dark' ? 'Switch to light mode' : 'Dark mode';
+}
+
+function setTheme(theme) {
+  const isDark = theme === 'dark';
+  document.body.classList.toggle('dark', isDark);
+  localStorage.setItem('clutchmate_theme', theme);
+  updateThemeButton(theme);
+}
+
+function initTheme() {
+  const storedTheme = localStorage.getItem('clutchmate_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  setTheme(storedTheme);
+}
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const nextTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+    setTheme(nextTheme);
+  });
+}
+
+document.getElementById("sidebarToggle").addEventListener("click", () => {
+  const app = document.querySelector(".app");
+  const sidebar = document.getElementById("mainSidebar");
+  sidebar.classList.toggle("collapsed");
+  const isCollapsed = sidebar.classList.contains("collapsed");
+  if (app) {
+    app.classList.toggle("sidebar-collapsed", isCollapsed);
+  }
+  document.getElementById("sidebarToggle").textContent = isCollapsed ? "Expand menu" : "Collapse menu";
+});
+
+initTheme();
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const savedToken = localStorage.getItem("clutchmate_token");
+  localStorage.removeItem("clutchmate_token");
+
+  try {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${savedToken}`
+      }
+    });
+  } catch (error) {
+    console.log("Logout request failed, but proceeding with local logout");
+  }
+
+  window.location.href = "/login";
+});
+
+requestNotificationPermission();
+scheduleAllAlarms();
+loadDashboard();
+</script>
+</body>
+</html>
+    

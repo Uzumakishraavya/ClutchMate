@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ClutchMate AI Experience</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<style>
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(249, 115, 22, 0.35), transparent 35%),
+    radial-gradient(circle at bottom right, rgba(34, 197, 94, 0.18), transparent 28%),
+    linear-gradient(135deg, #020617 0%, #0f172a 45%, #111827 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* CARD */
+.container {
+  width: 520px;
+  background: rgba(15, 23, 42, 0.82);
+  padding: 2em;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 30px 80px rgba(2, 6, 23, 0.42);
+  overflow: hidden;
+  backdrop-filter: blur(18px);
+}
+
+/* STEPS */
+.step {
+  display: none;
+}
+.step.active {
+  display: block;
+}
+
+/* TEXT */
+h2 {
+  margin-bottom: 10px;
+  color: #e2e8f0;
+}
+
+h1 {
+  color: #FFFFFF;
+}
+
+.aiText {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+  min-height: 20px;
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 10px;
+  background-color: rgba(148, 163, 184, 0.12);
+  color: #e2e8f0;
+  font-family: inherit;
+}
+
+input:focus {
+  outline: none;
+  border-color: rgba(249, 115, 22, 0.9);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #f97316, #fb7185);
+  color: #fff7ed;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  box-shadow: 0 14px 30px rgba(249, 115, 22, 0.24);
+  transform: translateY(-2px);
+}
+
+/* PROGRESS */
+.progressText {
+  text-align: right;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 10px;
+}
+.progressBar {
+  height: 6px;
+  width: 100%;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.progressFill {
+  width: 20%;
+  height: 100%;
+  background: linear-gradient(135deg, #f97316, #fb7185);
+  transition: width 0.35s ease;
+}
+.formMessage {
+  min-height: 1.3em;
+  color: #fca5a5;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* PREVIEW */
+.preview {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(148, 163, 184, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  color: #cbd5e1;
+}
+
+/* BARS */
+.bar {
+  height: 8px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-bottom: 8px;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #f97316, #fb7185);
+}
+
+/* INTRO */
+#intro {
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="intro">
+  <h1>ClutchMate</h1>
+  <p>Let’s build your perfect study system...</p>
+</div>
+
+<div id="mainUI" style="display:none;">
+
+<div class="progressText" id="progressText">Step 1 of 6</div>
+<div class="progressBar" aria-hidden="true"><div class="progressFill"></div></div>
+<p id="formMessage" class="formMessage" aria-live="assertive"></p>
+
+<!-- STEP 1 -->
+<div class="step active">
+  <h2 id="q1"></h2>
+  <p class="aiText" id="ai1"></p>
+  <label for="gradeClass">Grade/Class</label>
+  <input type="text" id="gradeClass" placeholder="e.g., 12th Grade, Class 10" required>
+  <button id="gradeClassNext" type="button">Next</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step">
+  <h2 id="q2"></h2>
+  <p class="aiText" id="ai2"></p>
+  <label for="subjects">Subjects</label>
+  <input type="text" id="subjects" placeholder="Math, Science" required>
+  <button id="subjectsNext" type="button">Next</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="step">
+  <h2 id="q3"></h2>
+  <p class="aiText" id="ai3"></p>
+  <div id="gradesContainer"></div>
+  <button id="scoresNext" type="button">Next</button>
+</div>
+
+<!-- STEP 4 -->
+<div class="step">
+  <h2 id="q4"></h2>
+  <label for="goal">Target grade</label>
+  <input type="number" id="goal" min="0" max="100" placeholder="95" required>
+  <button id="goalNext" type="button">Next</button>
+</div>
+
+<!-- STEP 5 -->
+<div class="step">
+  <h2 id="q5"></h2>
+  <label for="examDate">Exam date</label>
+  <input type="date" id="examDate" required>
+  <button id="dateNext" type="button">Next</button>
+</div>
+
+<!-- STEP 6 -->
+<div class="step">
+  <h2 id="q6"></h2>
+  <label for="studyTime">Daily study time (hours)</label>
+  <input type="number" id="studyTime" min="1" placeholder="3" required>
+  <button id="generateBtn" type="button">Generate Plan 🔥</button>
+</div>
+
+<div class="preview" id="previewBox">
+🤖 Your AI plan will appear here...
+</div>
+
+</div>
+
+</div>
+
+<script>
+  // Resolve the backend origin for both Flask-served and local static-dev usage.
+  const API_BASE_URL = (() => {
+    const configuredBaseUrl = window.localStorage.getItem("clutchmate_api_base_url");
+    if (configuredBaseUrl) {
+      return configuredBaseUrl.replace(/\/$/, "");
+    }
+
+    if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+      const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+      if (isLocalHost && window.location.port && window.location.port !== "5000") {
+        return "http://localhost:5000";
+      }
+      return window.location.origin;
+    }
+
+    return "http://localhost:5000";
+  })();
+
+let currentStep = 0;
+let subjectList = [];
+const steps = document.querySelectorAll(".step");
+const progressFill = document.querySelector(".progressFill");
+const formMessage = document.getElementById("formMessage");
+
+function showMessage(message, isError = true) {
+  formMessage.textContent = message;
+  formMessage.style.color = isError ? '#b91c1c' : '#1f8a3f';
+}
+
+function clearMessage() {
+  formMessage.textContent = '';
+}
+
+function updateProgress() {
+  const stepCount = steps.length;
+  const percent = ((currentStep + 1) / stepCount) * 100;
+  progressFill.style.width = `${percent}%`;
+  document.getElementById("progressText").innerText = `Step ${currentStep + 1} of ${stepCount}`;
+}
+
+function validateExamDate(dateValue) {
+  const selected = new Date(dateValue);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return selected > today;
+}
+
+function validateGrades() {
+  const gradeInputs = document.querySelectorAll(".gradeInput");
+  if (!gradeInputs.length) return false;
+  let hasValue = false;
+  for (const input of gradeInputs) {
+    if (!input.value) continue;
+    const v = Number(input.value);
+    if (isNaN(v) || v < 0 || v > 100) return false;
+    hasValue = true;
+  }
+  return hasValue;
+}
+
+function bindStepButtons() {
+  document.getElementById("gradeClassNext").addEventListener("click", handleGradeClass);
+  document.getElementById("subjectsNext").addEventListener("click", handleSubjects);
+  document.getElementById("scoresNext").addEventListener("click", () => {
+    if (!validateGrades()) {
+      showMessage('Please add at least one valid grade (0–100).');
+      return;
+    }
+    clearMessage();
+    nextStep();
+  });
+  document.getElementById("goalNext").addEventListener("click", () => {
+    const goal = Number(document.getElementById("goal").value);
+    if (!goal && goal !== 0) {
+      showMessage('Please enter a valid goal score.');
+      return;
+    }
+    if (goal < 0 || goal > 100) {
+      showMessage('Goal must be between 0 and 100.');
+      return;
+    }
+    clearMessage();
+    nextStep();
+  });
+  document.getElementById("dateNext").addEventListener("click", () => {
+    const dateValue = document.getElementById("examDate").value;
+    if (!dateValue || !validateExamDate(dateValue)) {
+      showMessage('Please choose a future exam date.');
+      return;
+    }
+    clearMessage();
+    nextStep();
+  });
+  document.getElementById("generateBtn").addEventListener("click", () => {
+    const studyTime = Number(document.getElementById("studyTime").value);
+    if (!studyTime || studyTime < 1) {
+      showMessage('Specify at least 1 hour daily study time.');
+      return;
+    }
+    clearMessage();
+    generatePlan();
+  });
+}
+
+bindStepButtons();
+
+/* 🎬 INTRO */
+setTimeout(() => {
+  gsap.to("#intro", { opacity: 0, duration: 0.6 });
+  setTimeout(() => {
+    document.getElementById("intro").style.display = "none";
+    document.getElementById("mainUI").style.display = "block";
+    updateProgress();
+    startTyping();
+  }, 600);
+}, 1200);
+
+/* 🤖 TYPING */
+function typeText(el, text, speed=25) {
+  let i = 0;
+  el.innerHTML = "";
+  function typing() {
+    if (i < text.length) {
+      el.innerHTML += text.charAt(i);
+      i++;
+      setTimeout(typing, speed);
+    }
+  }
+  typing();
+}
+
+function startTyping() {
+  typeText(document.getElementById("q1"), "What grade/class are you in?");
+  typeText(document.getElementById("ai1"), "Let's understand your academic level 📚");
+}
+
+/* STEP TRANSITION */
+function nextStep() {
+  if (currentStep >= steps.length - 1) return;
+
+  gsap.to(steps[currentStep], { x: -50, opacity: 0, duration: 0.3 });
+
+  setTimeout(() => {
+    steps[currentStep].classList.remove("active");
+    currentStep++;
+    steps[currentStep].classList.add("active");
+
+    gsap.from(steps[currentStep], { x: 50, opacity: 0, duration: 0.3 });
+
+    updateProgress();
+    handleTypingForStep();
+    updatePreview();
+  }, 300);
+}
+
+/* GRADE/CLASS HANDLER */
+function handleGradeClass() {
+  const gradeClass = document.getElementById("gradeClass").value.trim();
+  if (!gradeClass) {
+    showMessage('Please enter your grade/class.');
+    return;
+  }
+
+  clearMessage();
+  nextStep();
+}
+
+/* DYNAMIC SUBJECT INPUTS */
+function handleSubjects() {
+  const subjects = document.getElementById("subjects").value.trim();
+  if (!subjects) {
+    showMessage('Please enter at least one subject.');
+    return;
+  }
+
+  subjectList = subjects.split(",").map(s => s.trim()).filter(s => s);
+  if (!subjectList.length) {
+    showMessage('Please enter valid subjects separated by commas.');
+    return;
+  }
+
+  clearMessage();
+
+
+  const container = document.getElementById("gradesContainer");
+  container.innerHTML = "";
+
+  subjectList.forEach(sub => {
+    const input = document.createElement("input");
+    input.placeholder = sub + " (%)";
+    input.classList.add("gradeInput");
+    input.addEventListener("input", updatePreview);
+    container.appendChild(input);
+  });
+
+  nextStep();
+}
+
+/* AI TEXT PER STEP */
+function handleTypingForStep() {
+  if (currentStep === 1) {
+    typeText(document.getElementById("q2"), "What subjects are you studying?");
+    typeText(document.getElementById("ai2"), "Let's understand your workload 📚");
+  }
+  if (currentStep === 2) {
+    typeText(document.getElementById("q3"), "Enter your current scores");
+    typeText(document.getElementById("ai3"), "I've set everything up for you 🎯");
+  }
+  if (currentStep === 3) {
+    typeText(document.getElementById("q4"), "What's your target?");
+  }
+  if (currentStep === 4) {
+    typeText(document.getElementById("q5"), "When is your exam?");
+  }
+  if (currentStep === 5) {
+    typeText(document.getElementById("q6"), "Daily study time?");
+  }
+}
+
+/* 📊 LIVE PREVIEW */
+function updatePreview() {
+  const gradeInputs = document.querySelectorAll(".gradeInput");
+  const goal = document.getElementById("goal").value;
+  const examDate = document.getElementById("examDate").value;
+
+  let html = "";
+
+  let total = 0, count = 0;
+
+  gradeInputs.forEach((input, i) => {
+    if (input.value) {
+      let val = parseFloat(input.value);
+      total += val;
+      count++;
+
+      html += `
+        ${subjectList[i]}: ${val}%
+        <div class="bar"><div class="bar-fill" style="width:${val}%"></div></div>
+      `;
+    }
+  });
+
+  if (count === 0) return;
+
+  let avg = total / count;
+  let daysLeft = examDate ? Math.ceil((new Date(examDate) - new Date()) / (1000*60*60*24)) : 0;
+
+  html += `<br>📊 Avg: ${avg.toFixed(1)}%`;
+
+  if (goal && daysLeft) {
+    let required = ((goal - avg) / daysLeft).toFixed(2);
+    html += `<br>⚡ Need ${required}% daily improvement`;
+
+    if (avg < 70) html += "<br>🧠 We'll focus on weak subjects";
+    else html += "<br>🔥 Strong base — let's push higher!";
+  }
+
+  document.getElementById("previewBox").innerHTML = html;
+}
+
+/* 🎉 FINAL */
+function generatePlan() {
+  // Collect all form data
+  const formData = {
+    gradeClass: document.getElementById("gradeClass").value.trim(),
+    subjects: subjectList,
+    grades: {},
+    targetGrade: Number(document.getElementById("goal").value),
+    examDate: document.getElementById("examDate").value,
+    dailyStudyTime: Number(document.getElementById("studyTime").value)
+  };
+
+  // Collect grades
+  document.querySelectorAll(".gradeInput").forEach((input, i) => {
+    if (input.value) {
+      formData.grades[subjectList[i]] = Number(input.value);
+    }
+  });
+
+  // Store in localStorage temporarily (will be sent to backend)
+  localStorage.setItem("clutchmate_profile", JSON.stringify(formData));
+
+  // Send to backend
+  const token = localStorage.getItem("clutchmate_token");
+  if (!token) {
+    alert("No authentication token found. Please login first.");
+    window.location.href = "/login";
+    return;
+  }
+
+  fetch(`${API_BASE_URL}/user/personalize`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      gradeClass: formData.gradeClass,
+      subjects: formData.subjects,
+      grades: formData.grades,
+      goals: {
+        targetGrade: formData.targetGrade,
+        examDate: formData.examDate,
+        dailyStudyTime: formData.dailyStudyTime
+      }
+    })
+  })
+  .then(async response => {
+    const payload = await response.json();
+    if (!response.ok) {
+      const message = payload.error || payload.msg || payload.message || 'Failed to save preferences';
+      throw new Error(message);
+    }
+    return payload;
+  })
+  .then(data => {
+    if (data.message) {
+      document.getElementById("previewBox").innerHTML = "🎉 Your Clutch Plan is Ready!";
+      // Redirect to dashboard after showing success message
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 2000);
+    } else {
+      throw new Error(data.error || 'Failed to save preferences');
+    }
+  })
+  .catch(error => {
+    console.error('Personalization error:', error);
+    if (error.message && error.message.toLowerCase().includes('token')) {
+      document.getElementById("previewBox").innerHTML = "⏱️ Auth issue: please login again.";
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 1500);
+      return;
+    }
+
+    document.getElementById("previewBox").innerHTML = "❌ Error saving preferences. " + error.message;
+    setTimeout(() => {
+      document.getElementById("previewBox").innerHTML = "🤖 Your AI plan will appear here...";
+    }, 3000);
+  });
+}
+</script>
+
+</body>
+</html>

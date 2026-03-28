@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ClutchMate is your AI study partner for adaptive learning, smart planning, and real-time exam prep.">
+    <meta name="theme-color" content="#050505" />
+    <title>ClutchMate - Don't Panic. Just Clutch.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+      
+      :root {
+        --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+        --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+        
+        --color-brand-bg: #050505;
+        --color-brand-bg-secondary: #0a0a0a;
+        --color-brand-accent: #ff6b00;
+        --color-brand-accent-secondary: #ff9500;
+        --color-brand-text: #ffffff;
+        --color-brand-text-muted: #a1a1aa;
+        --color-brand-border: rgba(255, 255, 255, 0.1);
+      }
+
+      body {
+        background-color: var(--color-brand-bg);
+        color: var(--color-brand-text);
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-image: 
+          radial-gradient(circle at 50% -20%, rgba(255, 107, 0, 0.15), transparent 70%),
+          radial-gradient(circle at 0% 50%, rgba(255, 149, 0, 0.05), transparent 50%);
+        background-attachment: fixed;
+      }
+
+      .glass-card {
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+      
+      .glow-button {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(to right, var(--color-brand-accent), var(--color-brand-accent-secondary));
+        color: black;
+        font-weight: 700;
+        padding: 1rem 2rem;
+        border-radius: 9999px;
+        transition: all 0.3s duration;
+      }
+      
+      .glow-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px rgba(255, 107, 0, 0.5);
+      }
+
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        background-image: linear-gradient(to right, var(--color-brand-accent), var(--color-brand-accent-secondary));
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #0b1220;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Tailwind Utility Overrides for standalone */
+      .bg-brand-bg { background-color: var(--color-brand-bg); }
+      .text-brand-text { color: var(--color-brand-text); }
+      .text-brand-text-muted { color: var(--color-brand-text-muted); }
+      .bg-brand-bg-secondary\/50 { background-color: rgba(10, 10, 10, 0.5); }
+      .border-brand-accent\/30 { border-color: rgba(255, 107, 0, 0.3); }
+      .bg-brand-accent\/20 { background-color: rgba(255, 107, 0, 0.2); }
+      .bg-brand-accent\/10 { background-color: rgba(255, 107, 0, 0.1); }
+      .text-brand-accent { color: var(--color-brand-accent); }
+    </style>
+  </head>
+  <body class="bg-brand-bg text-brand-text font-sans antialiased selection:bg-brand-accent selection:text-white">
+    <div id="app" class="relative min-h-screen">
+      <!-- Navigation -->
+      <nav class="fixed top-0 left-0 right-0 z-[100] px-6 py-4 flex justify-between items-center backdrop-blur-md border-b border-white/5">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-accent to-brand-accent-secondary flex items-center justify-center">
+            <span class="text-white font-bold text-xl">C</span>
+          </div>
+          <span class="text-xl font-bold tracking-tight">ClutchMate</span>
+        </div>
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium text-brand-text-muted">
+          <a href="#features" class="hover:text-brand-text transition-colors">Features</a>
+          <a href="#how-it-works" class="hover:text-brand-text transition-colors">How it Works</a>
+          <a href="#demo" class="hover:text-brand-text transition-colors">Demo</a>
+          <a href="/login" class="hover:text-brand-text transition-colors">Login</a>
+          <a href="/signup" class="glow-button py-2 px-6 text-sm">Get Started</a>
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <section class="relative h-screen flex items-center px-6 md:px-24 overflow-hidden">
+        <div class="grid md:grid-cols-2 gap-12 items-center w-full max-w-7xl mx-auto">
+          <div class="z-10 hero-content opacity-0">
+            <h1 class="text-5xl md:text-7xl font-bold leading-tight mb-6">
+              Your AI Study Partner That <span class="text-gradient">Actually Understands You</span>
+            </h1>
+            <p class="text-xl text-brand-text-muted mb-8 max-w-lg">
+              Adaptive learning, smart planning, and real-time guidance built for students who want to win.
+            </p>
+            <div class="flex flex-wrap gap-4">
+              <a href="/signup" class="glow-button group inline-flex items-center justify-center">
+                Don't Panic. Just Clutch.
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right inline-block ml-2 group-hover:translate-x-1 transition-transform"><path d="m9 18 6-6-6-6"/></svg>
+              </a>
+              <a href="/login" class="px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 transition-all flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-play w-4 h-4"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                Login
+              </a>
+            </div>
+          </div>
+
+          <div class="relative h-[500px] md:h-[600px] z-0 flex items-center justify-center">
+            <div class="w-full h-full max-w-[500px] relative yeti-container">
+              <!-- Yeti Mascot SVG -->
+              <div class="w-full h-full flex items-center justify-center">
+                <svg id="yeti-svg" class="w-full h-full max-w-[400px] max-h-[400px]" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 200 200">
+                  <defs>
+                    <circle id="armMaskPath" cx="100" cy="100" r="100" />
+                    <clipPath id="armMask">
+                      <use xlink:href="#armMaskPath" overflow="visible" />
+                    </clipPath>
+                    <clipPath id="mouthMask">
+                      <use xlink:href="#mouthMaskPath" overflow="visible" />
+                    </clipPath>
+                    <path id="mouthMaskPath" d="M100.2,101c-0.4,0-1.4,0-1.8,0c-2.7-0.3-5.3-1.1-8-2.5c-0.7-0.3-0.9-1.2-0.6-1.8 c0.2-0.5,0.7-0.7,1.2-0.7c0.2,0,0.5,0.1,0.6,0.2c3,1.5,5.8,2.3,8.6,2.3s5.7-0.7,8.6-2.3c0.2-0.1,0.4-0.2,0.6-0.2 c0.5,0,1,0.3,1.2,0.7c0.4,0.7,0.1,1.5-0.6,1.9c-2.6,1.4-5.3,2.2-7.9,2.5C101.7,101,100.5,101,100.2,101z" />
+                  </defs>
+                  <circle cx="100" cy="100" r="100" fill="rgba(255, 107, 0, 0.1)" />
+                  <g class="body">
+                    <path id="bodyBGRef" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="#FFFFFF" d="M200,158.5c0-20.2-14.8-36.5-35-36.5h-14.9V72.8c0-27.4-21.7-50.4-49.1-50.8c-28-0.5-50.9,22.1-50.9,50v50 H35.8C16,122,0,138,0,157.8L0,213h200L200,158.5z" />
+                    <path fill="#fff5ed" d="M100,156.4c-22.9,0-43,11.1-54.1,27.7c15.6,10,34.2,15.9,54.1,15.9s38.5-5.8,54.1-15.9 C143,167.5,122.9,156.4,100,156.4z" />
+                  </g>
+                  <g id="outerEarLRef" class="earL">
+                    <g class="outerEar" fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5">
+                      <circle cx="47" cy="83" r="11.5" />
+                      <path d="M46.3 78.9c-2.3 0-4.1 1.9-4.1 4.1 0 2.3 1.9 4.1 4.1 4.1" stroke-linecap="round" stroke-linejoin="round" />
+                    </g>
+                    <g id="earHairLRef" class="earHair">
+                      <rect x="51" y="64" fill="#FFFFFF" width="15" height="35" />
+                      <path d="M53.4 62.8C48.5 67.4 45 72.2 42.8 77c3.4-.1 6.8-.1 10.1.1-4 3.7-6.8 7.6-8.2 11.6 2.1 0 4.2 0 6.3.2-2.6 4.1-3.8 8.3-3.7 12.5 1.2-.7 3.4-1.4 5.2-1.9" fill="#fff" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </g>
+                  </g>
+                  <g id="outerEarRRef" class="earR">
+                    <g class="outerEar">
+                      <circle fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" cx="153" cy="83" r="11.5" />
+                      <path fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M153.7,78.9 c2.3,0,4.1,1.9,4.1,4.1c0,2.3-1.9,4.1-4.1,4.1" />
+                    </g>
+                    <g id="earHairRRef" class="earHair">
+                      <rect x="134" y="64" fill="#FFFFFF" width="15" height="35" />
+                      <path fill="#FFFFFF" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M146.6,62.8 c4.9,4.6,8.4,9.4,10.6,14.2c-3.4-0.1-6.8-0.1-10.1,0.1c4,3.7,6.8,7.6,8.2,11.6c-2.1,0-4.2,0-6.3,0.2c2.6,4.1,3.8,8.3,3.7,12.5 c-1.2-0.7-3.4-1.4-5.2-1.9" />
+                    </g>
+                  </g>
+                  <path id="chinRef" class="chin" d="M84.1 121.6c2.7 2.9 6.1 5.4 9.8 7.5l.9-4.5c2.9 2.5 6.3 4.8 10.2 6.5 0-1.9-.1-3.9-.2-5.8 3 1.2 6.2 2 9.7 2.5-.3-2.1-.7-4.1-1.2-6.1" fill="none" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                  <path id="faceRef" class="face" fill="#fff5ed" d="M134.5,46v35.5c0,21.815-15.446,39.5-34.5,39.5s-34.5-17.685-34.5-39.5V46" />
+                  <path id="hairRef" class="hair" fill="#FFFFFF" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M81.457,27.929 c1.755-4.084,5.51-8.262,11.253-11.77c0.979,2.565,1.883,5.14,2.712,7.723c3.162-4.265,8.626-8.27,16.272-11.235 c-0.737,3.293-1.588,6.573-2.554,9.837c4.857-2.116,11.049-3.64,18.428-4.156c-2.403,3.23-5.021,6.391-7.852,9.474" />
+                  <g id="eyebrowRef" class="eyebrow">
+                    <path fill="#FFFFFF" d="M138.142,55.064c-4.93,1.259-9.874,2.118-14.787,2.599c-0.336,3.341-0.776,6.689-1.322,10.037 c-4.569-1.465-8.909-3.222-12.996-5.226c-0.98,3.075-2.07,6.137-3.267,9.179c-5.514-3.067-10.559-6.545-15.097-10.329 c-1.806,2.889-3.745,5.73-5.816,8.515c-7.916-4.124-15.053-9.114-21.296-14.738l1.107-11.768h73.475V55.064z" />
+                    <path fill="#FFFFFF" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M63.56,55.102 c6.243,5.624,13.38,10.614,21.296,14.738c2.071-2.785,4.01-5.626,5.816-8.515c4.537,3.785,9.583,7.263,15.097,10.329 c1.197-3.043,2.287-6.104,3.267-9.179c4.087,2.004,8.427,3.761,12.996,5.226c0.545-3.348,0.986-6.696,1.322-10.037 c4.913-0.481,9.857-1.34,14.787-2.599" />
+                  </g>
+                  <g id="eyeLRef" class="eyeL">
+                    <circle cx="85.5" cy="78.5" r="3.5" fill="#ff6b00" />
+                    <circle cx="84" cy="76" r="1" fill="#fff" />
+                  </g>
+                  <g id="eyeRRef" class="eyeR">
+                    <circle cx="114.5" cy="78.5" r="3.5" fill="#ff6b00" />
+                    <circle cx="113" cy="76" r="1" fill="#fff" />
+                  </g>
+                  <g id="mouthRef" class="mouth">
+                    <path id="mouthBGRef" class="mouthBG" fill="#ff6b00" d="M100.2,101c-0.4,0-1.4,0-1.8,0c-2.7-0.3-5.3-1.1-8-2.5c-0.7-0.3-0.9-1.2-0.6-1.8 c0.2-0.5,0.7-0.7,1.2-0.7c0.2,0,0.5,0.1,0.6,0.2c3,1.5,5.8,2.3,8.6,2.3s5.7-0.7,8.6-2.3c0.2-0.1,0.4-0.2,0.6-0.2 c0.5,0,1,0.3,1.2,0.7c0.4,0.7,0.1,1.5-0.6,1.9c-2.6,1.4-5.3,2.2-7.9,2.5C101.7,101,100.5,101,100.2,101z" />
+                    <g clip-path="url(#mouthMask)">
+                      <g id="tongueRef" class="tongue">
+                        <circle cx="100" cy="107" r="8" fill="#cc4a6c" />
+                        <ellipse class="tongueHighlight" cx="100" cy="100.5" rx="3" ry="1.5" opacity=".1" fill="#fff" />
+                      </g>
+                    </g>
+                    <path clip-path="url(#mouthMask)" id="toothRef" style="fill: #FFFFFF" d="M106,97h-4c-1.1,0-2-0.9-2-2v-2h8v2C108,96.1,107.1,97,106,97z" />
+                    <path id="mouthOutlineRef" class="mouthOutline" fill="none" stroke="#ff6b00" stroke-width="2.5" stroke-linejoin="round" d="M100.2,101c-0.4,0-1.4,0-1.8,0c-2.7-0.3-5.3-1.1-8-2.5c-0.7-0.3-0.9-1.2-0.6-1.8 c0.2-0.5,0.7-0.7,1.2-0.7c0.2,0,0.5,0.1,0.6,0.2c3,1.5,5.8,2.3,8.6,2.3s5.7-0.7,8.6-2.3c0.2-0.1,0.4-0.2,0.6-0.2 c0.5,0,1,0.3,1.2,0.7c0.4,0.7,0.1,1.5-0.6,1.9c-2.6,1.4-5.3,2.2-7.9,2.5C101.7,101,100.5,101,100.2,101z" />
+                  </g>
+                  <path id="noseRef" class="nose" d="M97.7 79.9h4.7c1.9 0 3 2.2 1.9 3.7l-2.3 3.3c-.9 1.3-2.9 1.3-3.8 0l-2.3-3.3c-1.3-1.6-.2-3.7 1.8-3.7z" fill="#ff6b00" />
+                  <g class="arms" clip-path="url(#armMask)">
+                    <g id="armLRef" class="armL">
+                      <polygon fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" points="121.3,98.4 111,59.7 149.8,49.3 169.8,85.4" />
+                      <path fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M134.4,53.5l19.3-5.2c2.7-0.7,5.4,0.9,6.1,3.5v0c0.7,2.7-0.9,5.4-3.5,6.1l-10.3,2.8" />
+                      <path fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M150.9,59.4l26-7c2.7-0.7,5.4,0.9,6.1,3.5v0c0.7,2.7-0.9,5.4-3.5,6.1l-21.3,5.7" />
+                      <g class="twoFingers">
+                        <path fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M158.3,67.8l23.1-6.2c2.7-0.7,5.4,0.9,6.1,3.5v0c0.7,2.7-0.9,5.4-3.5,6.1l-23.1,6.2" />
+                        <path fill="#ff6b00" d="M180.1,65l2.2-0.6c1.1-0.3,2.2,0.3,2.4,1.4v0c0.3,1.1-0.3,2.2-1.4,2.4l-2.2,0.6L180.1,65z" />
+                        <path fill="#fff5ed" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="M160.8,77.5l19.4-5.2c2.7-0.7,5.4,0.9,6.1,3.5v0c0.7,2.7-0.9,5.4-3.5,6.1l-18.3,4.9" />
+                        <path fill="#ff6b00" d="M178.8,75.7l2.2-0.6c1.1-0.3,2.2,0.3,2.4,1.4v0c0.3,1.1-0.3,2.2-1.4,2.4l-2.2,0.6L178.8,75.7z" />
+                      </g>
+                      <path fill="#ff6b00" d="M175.5,55.9l2.2-0.6c1.1-0.3,2.2,0.3,2.4,1.4v0c0.3,1.1-0.3,2.2-1.4,2.4l-2.2,0.6L175.5,55.9z" />
+                      <path fill="#ff6b00" d="M152.1,50.4l2.2-0.6c1.1-0.3,2.2,0.3,2.4,1.4v0c0.3,1.1-0.3,2.2-1.4,2.4l-2.2,0.6L152.1,50.4z" />
+                      <path fill="#FFFFFF" stroke="#ff6b00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M123.5,97.8 c-41.4,14.9-84.1,30.7-108.2,35.5L1.2,81c33.5-9.9,71.9-16.5,111.9-21.8" />
+                    </g>
+                    <g id="armRRef" class="armR">
+                      <path fill="#fff5ed" stroke="#ff6b00" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2.5" d="M265.4 97.3l10.4-38.6-38.9-10.5-20 36.1z" />
+                      <path fill="#fff5ed" stroke="#ff6b00" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2.5" d="M252.4 52.4L233 47.2c-2.7-.7-5.4.9-6.1 3.5-.7 2.7.9 5.4 3.5 6.1l10.3 2.8M226 76.4l-19.4-5.2c-2.7-.7-5.4.9-6.1 3.5-.7 2.7.9 5.4 3.5 6.1l18.3 4.9M228.4 66.7l-23.1-6.2c-2.7-.7-5.4.9-6.1 3.5-.7 2.7.9 5.4 3.5 6.1l23.1 6.2M235.8 58.3l-26-7c-2.7-.7-5.4.9-6.1 3.5-.7 2.7.9 5.4 3.5 6.1l21.3 5.7" />
+                      <path fill="#ff6b00" d="M207.9 74.7l-2.2-.6c-1.1-.3-2.2.3-2.4 1.4-.3 1.1.3 2.2 1.4 2.4l2.2.6 1-3.8zM206.7 64l-2.2-.6c-1.1-.3-2.2.3-2.4 1.4-.3 1.1.3 2.2 1.4 2.4l2.2.6 1-3.8zM211.2 54.8l-2.2-.6c-1.1-.3-2.2.3-2.4 1.4-.3 1.1.3 2.2 1.4 2.4l2.2.6 1-3.8zM234.6 49.4l-2.2-.6c-1.1-.3-2.2.3-2.4 1.4-.3 1.1.3 2.2 1.4 2.4l2.2.6 1-3.8z" />
+                      <path fill="#fff" stroke="#ff6b00" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M263.3 96.7c41.4 14.9 84.1 30.7 108.2 35.5l14-52.3C352 70 313.6 63.5 273.6 58.1" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
+              <!-- Speech Bubble -->
+              <div id="speech-bubble" class="absolute -top-12 left-1/2 -translate-x-1/2 z-20 pointer-events-none opacity-0 scale-90 transition-all duration-300">
+                <div class="relative bg-white text-black px-6 py-3 rounded-2xl font-bold shadow-2xl whitespace-nowrap">
+                  <span id="speech-text">Hey. Don't panic.</span>
+                  <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Background Accents -->
+        <div class="absolute top-1/4 -right-24 w-96 h-96 bg-brand-accent/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-1/4 -left-24 w-96 h-96 bg-brand-accent-secondary/10 blur-[120px] rounded-full"></div>
+      </section>
+
+      <!-- Problem Section -->
+      <section class="py-24 px-6 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+          <div class="text-center mb-16 problem-header opacity-0">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4">The Study Struggle is Real</h2>
+            <p class="text-brand-text-muted text-lg">Traditional studying is broken. We're here to fix it.</p>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 hover:border-brand-accent/30 transition-all group problem-card opacity-0">
+              <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div class="w-6 h-6 rounded-full bg-brand-accent/20"></div>
+              </div>
+              <h3 class="text-xl font-bold mb-4">Overwhelming Syllabus</h3>
+              <p class="text-brand-text-muted">Too much content, too little time. You don't know where to start.</p>
+            </div>
+            <div class="glass-card p-8 hover:border-brand-accent/30 transition-all group problem-card opacity-0">
+              <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div class="w-6 h-6 rounded-full bg-brand-accent/20"></div>
+              </div>
+              <h3 class="text-xl font-bold mb-4">No Personalization</h3>
+              <p class="text-brand-text-muted">One-size-fits-all learning doesn't work for your unique brain.</p>
+            </div>
+            <div class="glass-card p-8 hover:border-brand-accent/30 transition-all group problem-card opacity-0">
+              <div class="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div class="w-6 h-6 rounded-full bg-brand-accent/20"></div>
+              </div>
+              <h3 class="text-xl font-bold mb-4">Burnout</h3>
+              <p class="text-brand-text-muted">Constant stress leads to exhaustion and poor performance.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Features Section -->
+      <section id="features" class="py-24 px-6 bg-brand-bg-secondary/50">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 features-header opacity-0">
+            <div class="max-w-2xl">
+              <h2 class="text-4xl md:text-5xl font-bold mb-4">Everything ClutchMate does for you</h2>
+              <p class="text-brand-text-muted text-lg">All the tools you need to plan smarter, study deeper, stay balanced, and finish exams feeling prepared.</p>
+            </div>
+            <div class="hidden md:block">
+              <button class="text-brand-accent font-semibold flex items-center gap-2 hover:gap-3 transition-all">
+                See the full toolkit
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right w-4 h-4"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">AI Tutor</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Instantly answer questions, explain concepts, and help you recover lost confidence without waiting.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Adaptive Planning</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Create a dynamic study plan that adapts to your available time, exam date, and learning speed.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Progress Dashboard</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Track daily streaks, XP, completion rates, and your real readiness to finish strong.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Exam Readiness</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Know how many days remain, your current score trend, and where to prioritize revision.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Smart Review</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Use AI-generated revision cards, practice questions, and concept summaries based on your weaknesses.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Note Scanner</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Snap or upload notes and turn them into searchable lessons, summaries, and study checkpoints.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Mental Health</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Daily mood checks, recovery prompts, and calm timers keep your stress from derailing your prep.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Goal Setting</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Set stretch goals and daily targets, then let ClutchMate keep you accountable.</p>
+            </div>
+            <div class="glass-card p-8 hover:bg-white/[0.08] transition-all cursor-default group feature-card opacity-0">
+              <h3 class="text-xl font-bold mb-3">Smart Notifications</h3>
+              <p class="text-brand-text-muted text-sm leading-relaxed">Receive reminders for study blocks, review sessions, and wellness checks so nothing slips through the cracks.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works -->
+      <section id="how-it-works" class="py-24 px-6">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-4xl font-bold text-center mb-16 how-header opacity-0">Three Steps to <span class="text-gradient">Mastery</span></h2>
+          <div class="space-y-12">
+            <div class="flex gap-8 items-start step-item opacity-0">
+              <span class="text-6xl font-black text-white/5 select-none">01</span>
+              <div class="pt-4">
+                <h3 class="text-2xl font-bold mb-2">Sign Up</h3>
+                <p class="text-brand-text-muted text-lg">Create your profile and tell us about your academic goals.</p>
+              </div>
+            </div>
+            <div class="flex gap-8 items-start step-item opacity-0">
+              <span class="text-6xl font-black text-white/5 select-none">02</span>
+              <div class="pt-4">
+                <h3 class="text-2xl font-bold mb-2">Personalize Subjects</h3>
+                <p class="text-brand-text-muted text-lg">Upload your syllabus or select subjects you want to master.</p>
+              </div>
+            </div>
+            <div class="flex gap-8 items-start step-item opacity-0">
+              <span class="text-6xl font-black text-white/5 select-none">03</span>
+              <div class="pt-4">
+                <h3 class="text-2xl font-bold mb-2">Get AI-Powered Plan</h3>
+                <p class="text-brand-text-muted text-lg">Follow your custom roadmap and start clutching your exams.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Preview -->
+      <section id="demo" class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+          <div class="glass-card p-4 md:p-8 overflow-hidden relative group demo-card opacity-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-accent/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center gap-4">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+              <div class="px-4 py-1 rounded-full bg-white/5 text-xs text-brand-text-muted">clutchmate.ai/dashboard</div>
+            </div>
+            
+            <div class="grid md:grid-cols-12 gap-6">
+              <div class="md:col-span-3 space-y-4">
+                <div class="h-8 w-full bg-white/5 rounded-lg animate-pulse"></div>
+                <div class="h-24 w-full bg-white/5 rounded-lg animate-pulse"></div>
+                <div class="h-24 w-full bg-white/5 rounded-lg animate-pulse"></div>
+              </div>
+              <div class="md:col-span-9">
+                <div class="h-[400px] w-full bg-white/5 rounded-2xl border border-white/5 p-6">
+                  <div class="flex justify-between items-start mb-8">
+                    <div>
+                      <h4 class="text-xl font-bold mb-1">Study Progress</h4>
+                      <p class="text-xs text-brand-text-muted">You're in the top 5% this week!</p>
+                    </div>
+                    <div class="flex gap-2">
+                      <div class="w-20 h-8 bg-brand-accent/20 rounded-lg"></div>
+                      <div class="w-20 h-8 bg-white/5 rounded-lg"></div>
+                    </div>
+                  </div>
+                  <div class="flex items-end gap-2 h-48 chart-container">
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="40%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="70%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="45%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="90%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="65%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="80%"></div>
+                    <div class="flex-1 bg-gradient-to-t from-brand-accent to-brand-accent-secondary rounded-t-lg chart-bar" style="height: 0%" data-height="95%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="py-32 px-6 text-center relative overflow-hidden">
+        <div class="max-w-4xl mx-auto relative z-10 final-cta opacity-0">
+          <h2 class="text-4xl md:text-6xl font-bold mb-8">You don't need to stress anymore.</h2>
+          <p class="text-xl text-brand-text-muted mb-12">Join 50,000+ students who are clutching their exams with AI.</p>
+          <a href="/signup" class="glow-button text-lg px-12 py-5 inline-block">
+            Don't Panic. Just Clutch.
+          </a>
+          <p class="mt-8 text-brand-text-muted italic font-serif">"Just clutch."</p>
+        </div>
+        
+        <!-- Decorative blobs -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-brand-accent/10 blur-[150px] rounded-full -z-10"></div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="py-12 px-6 border-t border-white/5">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded bg-gradient-to-br from-brand-accent to-brand-accent-secondary"></div>
+            <span class="font-bold">ClutchMate</span>
+          </div>
+          <div class="flex gap-8 text-sm text-brand-text-muted">
+            <a href="#" class="hover:text-brand-text transition-colors">Privacy</a>
+            <a href="#" class="hover:text-brand-text transition-colors">Terms</a>
+            <a href="#" class="hover:text-brand-text transition-colors">Twitter</a>
+            <a href="#" class="hover:text-brand-text transition-colors">Discord</a>
+          </div>
+          <p class="text-xs text-brand-text-muted">© 2026 ClutchMate AI. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- Yeti Logic ---
+        const yetiElements = {
+          svg: document.getElementById('yeti-svg'),
+          armL: document.getElementById('armLRef'),
+          armR: document.getElementById('armRRef'),
+          eyeL: document.getElementById('eyeLRef'),
+          eyeR: document.getElementById('eyeRRef'),
+          nose: document.getElementById('noseRef'),
+          mouth: document.getElementById('mouthRef'),
+          mouthBG: document.getElementById('mouthBGRef'),
+          mouthOutline: document.getElementById('mouthOutlineRef'),
+          tooth: document.getElementById('toothRef'),
+          tongue: document.getElementById('tongueRef'),
+          chin: document.getElementById('chinRef'),
+          face: document.getElementById('faceRef'),
+          eyebrow: document.getElementById('eyebrowRef'),
+          outerEarL: document.getElementById('outerEarLRef'),
+          outerEarR: document.getElementById('outerEarRRef'),
+          earHairL: document.getElementById('earHairLRef'),
+          earHairR: document.getElementById('earHairRRef'),
+          hair: document.getElementById('hairRef'),
+          bodyBG: document.getElementById('bodyBGRef'),
+          speechBubble: document.getElementById('speech-bubble'),
+          speechText: document.getElementById('speech-text')
+        };
+
+        // Initial setup
+        if (yetiElements.armL) gsap.set(yetiElements.armL, { x: -93, y: 220, rotation: 105, transformOrigin: "top left", visibility: "hidden" });
+        if (yetiElements.armR) gsap.set(yetiElements.armR, { x: -93, y: 220, rotation: -105, transformOrigin: "top right", visibility: "hidden" });
+        if (yetiElements.mouth) gsap.set(yetiElements.mouth, { transformOrigin: "center center" });
+
+        // Blinking
+        function startBlinking(delay) {
+          const blinkTimeline = gsap.timeline({
+            delay: Math.random() * delay,
+            onComplete: () => startBlinking(5)
+          });
+          blinkTimeline.to([yetiElements.eyeL, yetiElements.eyeR], {
+            duration: 0.1,
+            scaleY: 0,
+            yoyo: true,
+            repeat: 1,
+            transformOrigin: "center center"
+          });
+        }
+        startBlinking(5);
+
+        // Mouse Follow
+        window.addEventListener('mousemove', (e) => {
+          if (!yetiElements.svg) return;
+          
+          const rect = yetiElements.svg.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          
+          const relativeX = (e.clientX - centerX) / (window.innerWidth / 2);
+          const relativeY = (e.clientY - centerY) / (window.innerHeight / 2);
+
+          const x = Math.max(-1, Math.min(1, relativeX));
+          const y = Math.max(-1, Math.min(1, relativeY));
+
+          const eyeLX = x * 12;
+          const eyeLY = y * 6;
+          const eyeRX = x * 12;
+          const eyeRY = y * 6;
+          const noseX = x * 18;
+          const noseY = y * 8;
+          const mouthX = x * 16;
+          const mouthY = y * 8;
+          const mouthR = x * 6;
+          const chinX = mouthX * 0.8;
+          const chinY = mouthY * 0.5;
+          const faceX = mouthX * 0.3;
+          const faceY = mouthY * 0.4;
+          const faceSkew = x * 5;
+          const eyebrowSkew = x * 15;
+          const outerEarX = x * 4;
+          const outerEarY = y * 4;
+          const hairX = x * 6;
+
+          gsap.to(yetiElements.eyeL, { duration: 1, x: eyeLX, y: eyeLY, ease: "expo.out" });
+          gsap.to(yetiElements.eyeR, { duration: 1, x: eyeRX, y: eyeRY, ease: "expo.out" });
+          gsap.to(yetiElements.nose, { duration: 1, x: noseX, y: noseY, rotation: -mouthR, transformOrigin: "center center", ease: "expo.out" });
+          gsap.to(yetiElements.mouth, { duration: 1, x: mouthX, y: mouthY, rotation: -mouthR, transformOrigin: "center center", ease: "expo.out" });
+          gsap.to(yetiElements.chin, { duration: 1, x: chinX, y: chinY, ease: "expo.out" });
+          gsap.to(yetiElements.face, { duration: 1, x: faceX, y: faceY, skewX: faceSkew, transformOrigin: "center top", ease: "expo.out" });
+          gsap.to(yetiElements.eyebrow, { duration: 1, x: faceX, y: faceY, skewX: eyebrowSkew, transformOrigin: "center top", ease: "expo.out" });
+          gsap.to(yetiElements.outerEarL, { duration: 1, x: outerEarX, y: -outerEarY, ease: "expo.out" });
+          gsap.to(yetiElements.outerEarR, { duration: 1, x: outerEarX, y: outerEarY, ease: "expo.out" });
+          gsap.to(yetiElements.earHairL, { duration: 1, x: -outerEarX, y: -outerEarY, ease: "expo.out" });
+          gsap.to(yetiElements.earHairR, { duration: 1, x: -outerEarX, y: outerEarY, ease: "expo.out" });
+          gsap.to(yetiElements.hair, { duration: 1, x: hairX, transformOrigin: "center bottom", ease: "expo.out" });
+        });
+
+        // Poses & Dialogue
+        function setYetiPose(pose) {
+          const setMouth = (status) => {
+            if (status === 'small') {
+              gsap.to(yetiElements.mouth, { duration: 0.5, scale: 1, ease: "expo.out" });
+            } else if (status === 'medium') {
+              gsap.to(yetiElements.mouth, { duration: 0.5, scale: 1.2, ease: "expo.out" });
+            } else if (status === 'large') {
+              gsap.to(yetiElements.mouth, { duration: 0.5, scale: 1.5, ease: "expo.out" });
+            }
+          };
+
+          // Reset some defaults
+          gsap.to([yetiElements.eyeL, yetiElements.eyeR], { duration: 1, scaleY: 1, ease: "expo.out" });
+          gsap.to(yetiElements.eyebrow, { duration: 1, y: 0, ease: "expo.out" });
+
+          if (pose === 'idle') {
+            setMouth('small');
+          } else if (pose === 'concerned') {
+            setMouth('medium');
+            gsap.to(yetiElements.eyebrow, { duration: 1, y: 2, ease: "expo.out" });
+          } else if (pose === 'confident') {
+            setMouth('large');
+            gsap.to([yetiElements.eyeL, yetiElements.eyeR], { duration: 1, scaleY: 0.8, ease: "expo.out" });
+          } else if (pose === 'pointing') {
+            setMouth('medium');
+          }
+        }
+
+        function updateDialogue(text) {
+          if (yetiElements.speechText.innerText === text) return;
+          
+          gsap.to(yetiElements.speechBubble, {
+            duration: 0.2,
+            opacity: 0,
+            scale: 0.9,
+            onComplete: () => {
+              yetiElements.speechText.innerText = text;
+              gsap.to(yetiElements.speechBubble, {
+                duration: 0.3,
+                opacity: 1,
+                scale: 1,
+                ease: "back.out(1.7)"
+              });
+            }
+          });
+        }
+
+        // Scroll Handling for Yeti
+        window.addEventListener('scroll', () => {
+          const scrollPercent = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+          
+          if (scrollPercent < 0.15) {
+            setYetiPose('idle');
+            updateDialogue("Hey. Don't panic.");
+          } else if (scrollPercent < 0.3) {
+            setYetiPose('concerned');
+            updateDialogue("Too much to study?");
+          } else if (scrollPercent < 0.5) {
+            setYetiPose('confident');
+            updateDialogue("Let's fix that.");
+          } else if (scrollPercent < 0.8) {
+            setYetiPose('pointing');
+            updateDialogue("This adapts to YOU.");
+          } else {
+            setYetiPose('confident');
+            updateDialogue("Just clutch.");
+          }
+        });
+
+        // Initial dialogue show
+        gsap.to(yetiElements.speechBubble, { delay: 1, duration: 0.5, opacity: 1, scale: 1, ease: "back.out(1.7)" });
+
+        // --- Section Animations ---
+        gsap.to('.hero-content', { opacity: 1, x: 0, duration: 1, ease: "power3.out" });
+
+        const fadeUpObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              gsap.to(entry.target, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" });
+              fadeUpObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.problem-header, .problem-card, .features-header, .feature-card, .how-header, .step-item, .demo-card, .final-cta').forEach(el => {
+          gsap.set(el, { opacity: 0, y: 30 });
+          fadeUpObserver.observe(el);
+        });
+
+        // --- Demo Chart Animation ---
+        const chartObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              document.querySelectorAll('.chart-bar').forEach((bar, i) => {
+                const targetHeight = bar.getAttribute('data-height');
+                gsap.to(bar, {
+                  height: targetHeight,
+                  duration: 1,
+                  delay: i * 0.1,
+                  ease: "power2.out"
+                });
+              });
+              chartObserver.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.5 });
+
+        const chartContainer = document.querySelector('.chart-container');
+        if (chartContainer) chartObserver.observe(chartContainer);
+      });
+    </script>
+  </body>
+</html>
