@@ -735,6 +735,11 @@ FRONTEND_PATH = Path(__file__).parent.parent / 'frontend'
 
 @app.route('/')
 def home():
+    if request.args.get('status') == 'json' or 'application/json' in request.headers.get('Accept', ''):
+        return jsonify({
+            'status': 'ClutchMate backend is live 🚀',
+            'message': 'API working'
+        })
     return send_file(str(FRONTEND_PATH / 'landingpage.html'))
 
 @app.route('/landing')
